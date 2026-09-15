@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Premium Store - Download Best Apps</title>
+  <title>Premium Store - Best Apps</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -19,7 +19,7 @@
     </div>
   </nav>
 
-  <!-- Header / Hero Section -->
+  <!-- Hero Section -->
   <header class="hero">
     <h2>Welcome to Premium Store</h2>
     <p>Download the latest and best premium applications for free.</p>
@@ -29,17 +29,27 @@
   <main class="container">
     
     <div class="section-title">
-      <h3>Latest Apps</h3>
+      <h3>Explore Apps</h3>
+    </div>
+
+    <!-- Category Filters -->
+    <div class="category-filters" id="categoryFilters">
+      <button class="filter-btn active" data-category="All">All</button>
+      <button class="filter-btn" data-category="AI">AI</button>
+      <button class="filter-btn" data-category="Tools">Tools</button>
+      <button class="filter-btn" data-category="Entertainment">Entertainment</button>
+      <button class="filter-btn" data-category="Social">Social</button>
+      <button class="filter-btn" data-category="Security">Security</button>
+      <button class="filter-btn" data-category="Other">Other</button>
     </div>
 
     <!-- Apps Grid -->
     <div class="apps-grid" id="appsGrid">
-      <div class="loading">Loading apps...</div>
+      <!-- JS দিয়ে এখানে স্কেলিটন বা অ্যাপ লোড হবে -->
     </div>
 
   </main>
 
-  <!-- Footer -->
   <footer>
     <p>&copy; 2026 Premium Store. All rights reserved.</p>
   </footer>
