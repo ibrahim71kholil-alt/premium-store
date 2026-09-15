@@ -1,1239 +1,963 @@
-/* =====================================================
+/* ==========================================
    PREMIUM STORE
-   ADMIN PANEL
-   FIREBASE + APPWRITE
-===================================================== */
+   ADMIN PANEL JAVASCRIPT
+   ========================================== */
 
 
-/* =====================================================
-   FIREBASE CONFIG
-===================================================== */
+/* ================= FIREBASE CONFIG ================= */
 
 const firebaseConfig = {
 
-    apiKey: "AIzaSyDNItGEILCV3ssNYSe2sSqa-4w40GfNsLs",
+  apiKey:
+    "AIzaSyDNItGEILCV3ssNYSe2sSqa-4w40GfNsLs",
 
-    authDomain:
-        "premium-store-abb6f.firebaseapp.com",
+  authDomain:
+    "premium-store-abb6f.firebaseapp.com",
 
-    projectId:
-        "premium-store-abb6f",
+  projectId:
+    "premium-store-abb6f",
 
-    storageBucket:
-        "premium-store-abb6f.firebasestorage.app",
+  storageBucket:
+    "premium-store-abb6f.firebasestorage.app",
 
-    messagingSenderId:
-        "706337940165",
+  messagingSenderId:
+    "706337940165",
 
-    appId:
-        "1:706337940165:web:183f9ef3e9ab23a93606ac"
+  appId:
+    "1:706337940165:web:183f9ef3e9ab23a93606ac"
 
 };
 
 
-/* =====================================================
-   FIREBASE INITIALIZE
-===================================================== */
+/* ================= FIREBASE START ================= */
 
 firebase.initializeApp(firebaseConfig);
 
-const auth = firebase.auth();
+const auth =
+  firebase.auth();
 
-const db = firebase.firestore();
+const db =
+  firebase.firestore();
 
 
-/* =====================================================
-   FIREBASE ADMIN UID
-===================================================== */
+/* ================= ADMIN UID ================= */
+
+/*
+  শুধু আপনার Firebase Admin account
+  এই UID দিয়ে Add/Edit/Delete করতে পারবে।
+*/
 
 const ADMIN_UID =
-    "KdZ72nHmJrOEET2fVkRuHrSfPE93";
+  "KdZ72nHmJrOEET2fVkRuHrSfPE93";
 
 
-/* =====================================================
-   APPWRITE CONFIG
-===================================================== */
-
-const APPWRITE_ENDPOINT =
-    "https://cloud.appwrite.io/v1";
-
-const APPWRITE_PROJECT_ID =
-    "6aa8fe7e0033f2b50491";
-
-const APPWRITE_BUCKET_ID =
-    "6aa8fe7e0033f2b50491";
-
-
-/* =====================================================
-   APPWRITE INITIALIZE
-===================================================== */
-
-const { Client, Account, Storage, ID } = Appwrite;
-
-
-const appwriteClient =
-    new Client();
-
-appwriteClient
-    .setEndpoint(APPWRITE_ENDPOINT)
-    .setProject(APPWRITE_PROJECT_ID);
-
-
-const appwriteAccount =
-    new Account(appwriteClient);
-
-
-const appwriteStorage =
-    new Storage(appwriteClient);
-
-
-/* =====================================================
-   ELEMENTS
-===================================================== */
+/* ================= ELEMENTS ================= */
 
 const loginPage =
-    document.getElementById("loginPage");
+  document.getElementById("loginPage");
 
 const dashboardPage =
-    document.getElementById("dashboardPage");
+  document.getElementById("dashboardPage");
 
 const loginForm =
-    document.getElementById("loginForm");
-
-const loginEmail =
-    document.getElementById("loginEmail");
-
-const loginPassword =
-    document.getElementById("loginPassword");
+  document.getElementById("loginForm");
 
 const loginMessage =
-    document.getElementById("loginMessage");
+  document.getElementById("loginMessage");
 
-const logoutBtn =
-    document.getElementById("logoutBtn");
+const loginButton =
+  document.getElementById("loginButton");
+
+const logoutButton =
+  document.getElementById("logoutButton");
+
 
 const appForm =
-    document.getElementById("appForm");
+  document.getElementById("appForm");
 
-const apkFile =
-    document.getElementById("apkFile");
+const formTitle =
+  document.getElementById("formTitle");
 
-const selectedApk =
-    document.getElementById("selectedApk");
+const saveButton =
+  document.getElementById("saveButton");
 
-const uploadProgress =
-    document.getElementById("uploadProgress");
+const cancelButton =
+  document.getElementById("cancelButton");
 
-const apkUrl =
-    document.getElementById("apkUrl");
-
-const publishBtn =
-    document.getElementById("publishBtn");
-
-const cancelEditBtn =
-    document.getElementById("cancelEditBtn");
-
-const refreshBtn =
-    document.getElementById("refreshBtn");
+const formMessage =
+  document.getElementById("formMessage");
 
 const appsList =
-    document.getElementById("appsList");
+  document.getElementById("appsList");
+
+const refreshButton =
+  document.getElementById("refreshButton");
 
 
-/* =====================================================
-   LOGIN
-===================================================== */
+/* ================= AUTH STATE ================= */
+
+auth.onAuthStateChanged(function(user){
+
+  if(user){
+
+    /*
+      Extra protection:
+      Firebase account login হলেও
+      UID match না করলে Dashboard খুলবে না।
+    */
+
+    if(user.uid !== ADMIN_UID){
+
+      loginMessage.textContent =
+        "This account is not authorized.";
+
+      auth.signOut();
+
+      return;
+    }
+
+
+    /* Show dashboard */
+
+    loginPage.classList.add("hidden");
+
+    dashboardPage.classList.remove("hidden");
+
+
+    /* Load apps */
+
+    loadApps();
+
+  }
+
+  else{
+
+    /* Show login */
+
+    loginPage.classList.remove("hidden");
+
+    dashboardPage.classList.add("hidden");
+
+  }
+
+});
+
+
+/* ================= LOGIN ================= */
 
 loginForm.addEventListener(
-    "submit",
-    async function(event) {
+  "submit",
+  async function(event){
 
-        event.preventDefault();
-
-        const email =
-            loginEmail.value.trim();
-
-        const password =
-            loginPassword.value;
+    event.preventDefault();
 
 
-        loginMessage.textContent =
-            "Logging in...";
+    const email =
+      document.getElementById("email")
+      .value
+      .trim();
 
 
-        try {
-
-            /* Firebase login */
-
-            const result =
-                await auth.signInWithEmailAndPassword(
-                    email,
-                    password
-                );
+    const password =
+      document.getElementById("password")
+      .value;
 
 
-            const user =
-                result.user;
+    loginButton.disabled = true;
+
+    loginButton.textContent =
+      "LOGIN...";
 
 
-            /* Check Firebase Admin */
-
-            if (
-                user.uid !== ADMIN_UID
-            ) {
-
-                await auth.signOut();
-
-                throw new Error(
-                    "You are not authorized as admin."
-                );
-
-            }
+    loginMessage.textContent =
+      "";
 
 
-            /* Appwrite login */
+    try{
 
-            try {
+      await auth.signInWithEmailAndPassword(
+        email,
+        password
+      );
 
-                await appwriteAccount
-                    .createEmailPasswordSession(
-                        email,
-                        password
-                    );
-
-            }
-
-            catch (appwriteError) {
-
-                console.error(
-                    "Appwrite login:",
-                    appwriteError
-                );
-
-                throw new Error(
-                    "Firebase login successful, but Appwrite login failed. Make sure the same admin email/password exists in Appwrite Authentication."
-                );
-
-            }
-
-
-            loginMessage.textContent =
-                "";
-
-
-            showDashboard();
-
-            await loadApps();
-
-        }
-
-        catch (error) {
-
-            console.error(error);
-
-            loginMessage.textContent =
-                error.message ||
-                "Login failed.";
-
-        }
 
     }
+
+    catch(error){
+
+      console.error(error);
+
+      loginMessage.textContent =
+        "Login failed. Check email and password.";
+
+    }
+
+
+    finally{
+
+      loginButton.disabled = false;
+
+      loginButton.textContent =
+        "LOGIN";
+
+    }
+
+  }
 );
 
 
-/* =====================================================
-   AUTH STATE
-===================================================== */
+/* ================= LOGOUT ================= */
 
-auth.onAuthStateChanged(
-    async function(user) {
+logoutButton.addEventListener(
+  "click",
+  async function(){
 
-        if (!user) {
+    await auth.signOut();
 
-            showLogin();
-
-            return;
-
-        }
-
-
-        if (
-            user.uid !== ADMIN_UID
-        ) {
-
-            await auth.signOut();
-
-            showLogin();
-
-            return;
-
-        }
-
-
-        try {
-
-            await appwriteAccount.get();
-
-            showDashboard();
-
-            await loadApps();
-
-        }
-
-        catch (error) {
-
-            console.log(
-                "Appwrite session not active."
-            );
-
-            showLogin();
-
-        }
-
-    }
+  }
 );
 
 
-/* =====================================================
-   SHOW LOGIN
-===================================================== */
-
-function showLogin() {
-
-    loginPage.style.display =
-        "flex";
-
-    dashboardPage.style.display =
-        "none";
-
-}
-
-
-/* =====================================================
-   SHOW DASHBOARD
-===================================================== */
-
-function showDashboard() {
-
-    loginPage.style.display =
-        "none";
-
-    dashboardPage.style.display =
-        "block";
-
-}
-
-
-/* =====================================================
-   LOGOUT
-===================================================== */
-
-logoutBtn.addEventListener(
-    "click",
-    async function() {
-
-        try {
-
-            await appwriteAccount
-                .deleteSession("current");
-
-        }
-
-        catch (error) {
-
-            console.log(
-                "Appwrite logout:",
-                error
-            );
-
-        }
-
-
-        try {
-
-            await auth.signOut();
-
-        }
-
-        catch (error) {
-
-            console.log(error);
-
-        }
-
-
-        showLogin();
-
-    }
-);
-
-
-/* =====================================================
-   APK FILE SELECT
-===================================================== */
-
-apkFile.addEventListener(
-    "change",
-    function() {
-
-        const file =
-            apkFile.files[0];
-
-
-        if (!file) {
-
-            selectedApk.textContent =
-                "No APK selected";
-
-            return;
-
-        }
-
-
-        if (
-            !file.name
-                .toLowerCase()
-                .endsWith(".apk")
-        ) {
-
-            selectedApk.textContent =
-                "Please select a valid APK file.";
-
-            apkFile.value =
-                "";
-
-            return;
-
-        }
-
-
-        const sizeMB =
-            (
-                file.size /
-                1024 /
-                1024
-            ).toFixed(2);
-
-
-        selectedApk.textContent =
-            `${file.name} • ${sizeMB} MB`;
-
-    }
-);
-
-
-/* =====================================================
-   UPLOAD APK TO APPWRITE
-===================================================== */
-
-async function uploadAPK(file) {
-
-    if (!file) {
-
-        throw new Error(
-            "Please select an APK file."
-        );
-
-    }
-
-
-    if (
-        !file.name
-            .toLowerCase()
-            .endsWith(".apk")
-    ) {
-
-        throw new Error(
-            "Only APK files are allowed."
-        );
-
-    }
-
-
-    uploadProgress.textContent =
-        "Uploading APK...";
-
-
-    publishBtn.disabled =
-        true;
-
-
-    try {
-
-        const fileId =
-            ID.unique();
-
-
-        const result =
-            await appwriteStorage.createFile(
-                APPWRITE_BUCKET_ID,
-                fileId,
-                Appwrite.InputFile.fromFile(file)
-            );
-
-
-        uploadProgress.textContent =
-            "APK uploaded successfully.";
-
-
-        /*
-          Public download URL
-        */
-
-        const downloadURL =
-            `${APPWRITE_ENDPOINT}/storage/buckets/${APPWRITE_BUCKET_ID}/files/${result.$id}/download?project=${APPWRITE_PROJECT_ID}`;
-
-
-        return downloadURL;
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "APK Upload Error:",
-            error
-        );
-
-        uploadProgress.textContent =
-            "";
-
-        throw new Error(
-            error.message ||
-            "APK upload failed."
-        );
-
-    }
-
-    finally {
-
-        publishBtn.disabled =
-            false;
-
-    }
-
-}
-
-
-/* =====================================================
-   APP FORM SUBMIT
-===================================================== */
+/* ================= ADD / EDIT APP ================= */
 
 appForm.addEventListener(
-    "submit",
-    async function(event) {
+  "submit",
+  async function(event){
 
-        event.preventDefault();
+    event.preventDefault();
 
 
-        try {
+    const editId =
+      document.getElementById("editId")
+      .value
+      .trim();
 
-            publishBtn.disabled =
-                true;
 
+    const name =
+      document.getElementById("appName")
+      .value
+      .trim();
 
-            publishBtn.textContent =
-                "Publishing...";
 
+    const category =
+      document.getElementById("category")
+      .value;
 
-            const editingId =
-                document
-                    .getElementById(
-                        "editingAppId"
-                    )
-                    .value;
 
+    const description =
+      document.getElementById("description")
+      .value
+      .trim();
 
-            let finalApkURL =
-                apkUrl.value.trim();
 
+    const version =
+      document.getElementById("version")
+      .value
+      .trim();
 
-            /*
-              If new APK selected,
-              upload it first.
-            */
 
-            if (
-                apkFile.files.length > 0
-            ) {
+    const size =
+      document.getElementById("size")
+      .value
+      .trim();
 
-                finalApkURL =
-                    await uploadAPK(
-                        apkFile.files[0]
-                    );
-
-            }
-
-
-            if (!finalApkURL) {
-
-                throw new Error(
-                    "Please upload an APK or enter an APK URL."
-                );
-
-            }
-
-
-            const screenshotsText =
-                document
-                    .getElementById(
-                        "screenshots"
-                    )
-                    .value
-                    .trim();
-
-
-            const screenshots =
-                screenshotsText
-                    ? screenshotsText
-                        .split("\n")
-                        .map(
-                            url =>
-                                url.trim()
-                        )
-                        .filter(Boolean)
-                    : [];
-
-
-            const appData = {
-
-                name:
-                    document
-                        .getElementById(
-                            "appName"
-                        )
-                        .value
-                        .trim(),
-
-                description:
-                    document
-                        .getElementById(
-                            "appDescription"
-                        )
-                        .value
-                        .trim(),
 
-                category:
-                    document
-                        .getElementById(
-                            "appCategory"
-                        )
-                        .value,
+    const androidVersion =
+      document.getElementById("androidVersion")
+      .value
+      .trim();
 
-                version:
-                    document
-                        .getElementById(
-                            "appVersion"
-                        )
-                        .value
-                        .trim(),
-
-                size:
-                    document
-                        .getElementById(
-                            "appSize"
-                        )
-                        .value
-                        .trim(),
-
-                androidVersion:
-                    document
-                        .getElementById(
-                            "androidVersion"
-                        )
-                        .value
-                        .trim(),
 
-                iconUrl:
-                    document
-                        .getElementById(
-                            "iconUrl"
-                        )
-                        .value
-                        .trim(),
+    const downloads =
+      Number(
+        document.getElementById("downloads")
+        .value
+      ) || 0;
 
-                apkUrl:
-                    finalApkURL,
 
-                screenshots:
-                    screenshots,
+    const iconUrl =
+      document.getElementById("iconUrl")
+      .value
+      .trim();
 
-                featured:
-                    document
-                        .getElementById(
-                            "featured"
-                        )
-                        .checked,
 
-                latest:
-                    document
-                        .getElementById(
-                            "latest"
-                        )
-                        .checked,
+    const apkUrl =
+      document.getElementById("apkUrl")
+      .value
+      .trim();
 
-                downloads:
-                    Number(
-                        document
-                            .getElementById(
-                                "downloadCount"
-                            )
-                            .value
-                    ) || 0,
 
-                updatedAt:
-                    firebase.firestore
-                        .FieldValue
-                        .serverTimestamp()
+    const screenshotsText =
+      document.getElementById("screenshots")
+      .value
+      .trim();
 
-            };
 
+    const featured =
+      document.getElementById("featured")
+      .checked;
 
-            if (editingId) {
 
-                await db
-                    .collection("apps")
-                    .doc(editingId)
-                    .update(
-                        appData
-                    );
+    const latest =
+      document.getElementById("latest")
+      .checked;
 
-                alert(
-                    "App updated successfully!"
-                );
 
-            }
+    /* Screenshot URLs */
 
-            else {
+    const screenshots =
+      screenshotsText
 
-                appData.createdAt =
-                    firebase.firestore
-                        .FieldValue
-                        .serverTimestamp();
+      ? screenshotsText
+          .split("\n")
+          .map(function(url){
+            return url.trim();
+          })
+          .filter(function(url){
+            return url.length > 0;
+          })
 
+      : [];
 
-                await db
-                    .collection("apps")
-                    .add(
-                        appData
-                    );
 
+    /* App data */
 
-                alert(
-                    "App published successfully!"
-                );
+    const appData = {
 
-            }
+      name:name,
 
+      description:description,
 
-            resetForm();
+      category:category,
 
-            await loadApps();
+      version:version,
 
-        }
+      size:size,
 
-        catch (error) {
+      androidVersion:androidVersion,
 
-            console.error(error);
+      iconUrl:iconUrl,
 
-            alert(
-                error.message ||
-                "Something went wrong."
-            );
+      apkUrl:apkUrl,
 
-        }
+      screenshots:screenshots,
 
-        finally {
+      featured:featured,
 
-            publishBtn.disabled =
-                false;
+      latest:latest,
 
-            publishBtn.textContent =
-                "Publish App";
+      downloads:downloads,
 
-        }
+      updatedAt:
+        firebase.firestore
+        .FieldValue
+        .serverTimestamp()
 
-    }
-);
+    };
 
 
-/* =====================================================
-   LOAD APPS
-===================================================== */
+    try{
 
-async function loadApps() {
+      saveButton.disabled = true;
 
-    try {
+      saveButton.textContent =
+        "SAVING...";
 
-        const snapshot =
-            await db
-                .collection("apps")
-                .orderBy(
-                    "updatedAt",
-                    "desc"
-                )
-                .get();
 
+      /* EDIT */
 
-        const apps =
-            [];
-
-
-        snapshot.forEach(
-            doc => {
-
-                apps.push({
-
-                    id:
-                        doc.id,
-
-                    ...doc.data()
-
-                });
-
-            }
-        );
-
-
-        updateStats(apps);
-
-        renderApps(apps);
-
-    }
-
-    catch (error) {
-
-        console.error(error);
-
-        appsList.innerHTML =
-            `<p>Failed to load apps.</p>`;
-
-    }
-
-}
-
-
-/* =====================================================
-   UPDATE STATS
-===================================================== */
-
-function updateStats(apps) {
-
-    document
-        .getElementById(
-            "totalApps"
-        )
-        .textContent =
-        apps.length;
-
-
-    document
-        .getElementById(
-            "featuredApps"
-        )
-        .textContent =
-        apps.filter(
-            app => app.featured
-        ).length;
-
-
-    document
-        .getElementById(
-            "latestApps"
-        )
-        .textContent =
-        apps.filter(
-            app => app.latest
-        ).length;
-
-}
-
-
-/* =====================================================
-   RENDER APPS
-===================================================== */
-
-function renderApps(apps) {
-
-    if (!apps.length) {
-
-        appsList.innerHTML =
-            "<p>No apps found.</p>";
-
-        return;
-
-    }
-
-
-    appsList.innerHTML =
-        apps.map(
-            app => `
-
-            <div class="app-item">
-
-                <div>
-
-                    <strong>
-                        ${escapeHTML(
-                            app.name || ""
-                        )}
-                    </strong>
-
-                    <p>
-                        ${escapeHTML(
-                            app.category || ""
-                        )}
-                    </p>
-
-                </div>
-
-
-                <div class="app-actions">
-
-                    <button
-                        onclick="editApp('${app.id}')"
-                    >
-                        Edit
-                    </button>
-
-                    <button
-                        onclick="deleteApp('${app.id}')"
-                    >
-                        Delete
-                    </button>
-
-                </div>
-
-            </div>
-
-        `
-        ).join("");
-
-}
-
-
-/* =====================================================
-   EDIT APP
-===================================================== */
-
-window.editApp =
-async function(id) {
-
-    try {
-
-        const doc =
-            await db
-                .collection("apps")
-                .doc(id)
-                .get();
-
-
-        if (!doc.exists) {
-
-            alert(
-                "App not found."
-            );
-
-            return;
-
-        }
-
-
-        const app =
-            doc.data();
-
-
-        document
-            .getElementById(
-                "editingAppId"
-            )
-            .value =
-            id;
-
-
-        document
-            .getElementById(
-                "appName"
-            )
-            .value =
-            app.name || "";
-
-
-        document
-            .getElementById(
-                "appCategory"
-            )
-            .value =
-            app.category || "";
-
-
-        document
-            .getElementById(
-                "appDescription"
-            )
-            .value =
-            app.description || "";
-
-
-        document
-            .getElementById(
-                "appVersion"
-            )
-            .value =
-            app.version || "";
-
-
-        document
-            .getElementById(
-                "appSize"
-            )
-            .value =
-            app.size || "";
-
-
-        document
-            .getElementById(
-                "androidVersion"
-            )
-            .value =
-            app.androidVersion || "";
-
-
-        document
-            .getElementById(
-                "downloadCount"
-            )
-            .value =
-            app.downloads || 0;
-
-
-        document
-            .getElementById(
-                "iconUrl"
-            )
-            .value =
-            app.iconUrl || "";
-
-
-        document
-            .getElementById(
-                "apkUrl"
-            )
-            .value =
-            app.apkUrl || "";
-
-
-        document
-            .getElementById(
-                "screenshots"
-            )
-            .value =
-            (
-                app.screenshots || []
-            ).join("\n");
-
-
-        document
-            .getElementById(
-                "featured"
-            )
-            .checked =
-            !!app.featured;
-
-
-        document
-            .getElementById(
-                "latest"
-            )
-            .checked =
-            !!app.latest;
-
-
-        document
-            .getElementById(
-                "formTitle"
-            )
-            .textContent =
-            "Edit App";
-
-
-        publishBtn.textContent =
-            "Update App";
-
-
-        cancelEditBtn.style.display =
-            "inline-block";
-
-
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
-
-    }
-
-    catch (error) {
-
-        console.error(error);
-
-        alert(
-            "Failed to load app."
-        );
-
-    }
-
-};
-
-
-/* =====================================================
-   DELETE APP
-===================================================== */
-
-window.deleteApp =
-async function(id) {
-
-    const confirmDelete =
-        confirm(
-            "Are you sure you want to delete this app?"
-        );
-
-
-    if (!confirmDelete) {
-        return;
-    }
-
-
-    try {
+      if(editId){
 
         await db
-            .collection("apps")
-            .doc(id)
-            .delete();
+          .collection("apps")
+          .doc(editId)
+          .update(appData);
 
 
-        alert(
-            "App deleted successfully."
-        );
+        formMessage.textContent =
+          "App updated successfully.";
+
+      }
 
 
-        await loadApps();
+      /* ADD */
+
+      else{
+
+        appData.createdAt =
+          firebase.firestore
+          .FieldValue
+          .serverTimestamp();
+
+
+        await db
+          .collection("apps")
+          .add(appData);
+
+
+        formMessage.textContent =
+          "App added successfully.";
+
+      }
+
+
+      resetForm();
+
+      await loadApps();
 
     }
 
-    catch (error) {
 
-        console.error(error);
+    catch(error){
 
-        alert(
-            "Failed to delete app."
-        );
+      console.error(error);
+
+      formMessage.textContent =
+        "Something went wrong. Check Firebase.";
 
     }
 
-};
+
+    finally{
+
+      saveButton.disabled = false;
+
+      saveButton.textContent =
+        "ADD APP";
+
+    }
+
+  }
+);
 
 
-/* =====================================================
-   RESET FORM
-===================================================== */
+/* ================= LOAD APPS ================= */
 
-function resetForm() {
+async function loadApps(){
 
-    appForm.reset();
-
-
-    document
-        .getElementById(
-            "editingAppId"
-        )
-        .value =
-        "";
+  appsList.innerHTML =
+    '<div class="loading">Loading apps...</div>';
 
 
-    apkUrl.value =
-        "";
+  try{
+
+    const snapshot =
+      await db
+        .collection("apps")
+        .get();
 
 
-    selectedApk.textContent =
-        "No APK selected";
+    const apps = [];
 
 
-    uploadProgress.textContent =
-        "";
+    snapshot.forEach(
+      function(doc){
+
+        apps.push({
+
+          id:doc.id,
+
+          ...doc.data()
+
+        });
+
+      }
+    );
 
 
-    document
-        .getElementById(
-            "formTitle"
-        )
-        .textContent =
-        "Add New App";
+    updateStats(apps);
+
+    renderApps(apps);
+
+  }
 
 
-    publishBtn.textContent =
-        "Publish App";
+  catch(error){
 
+    console.error(error);
 
-    cancelEditBtn.style.display =
-        "none";
+    appsList.innerHTML =
+      '<div class="empty">Could not load apps.</div>';
+
+  }
 
 }
 
 
-/* =====================================================
-   CANCEL EDIT
-===================================================== */
+/* ================= STATS ================= */
 
-cancelEditBtn.addEventListener(
-    "click",
-    function() {
+function updateStats(apps){
 
-        resetForm();
+  document.getElementById(
+    "totalApps"
+  ).textContent =
+    apps.length;
+
+
+  document.getElementById(
+    "featuredApps"
+  ).textContent =
+
+    apps.filter(function(app){
+
+      return app.featured === true;
+
+    }).length;
+
+
+  document.getElementById(
+    "latestApps"
+  ).textContent =
+
+    apps.filter(function(app){
+
+      return app.latest === true;
+
+    }).length;
+
+}
+
+
+/* ================= RENDER APPS ================= */
+
+function renderApps(apps){
+
+  if(apps.length === 0){
+
+    appsList.innerHTML =
+      '<div class="empty">No apps added yet.</div>';
+
+    return;
+  }
+
+
+  appsList.innerHTML = "";
+
+
+  apps.forEach(function(app){
+
+    const item =
+      document.createElement("div");
+
+
+    item.className =
+      "app-item";
+
+
+    /* ICON */
+
+    let iconHTML = "";
+
+
+    if(app.iconUrl){
+
+      iconHTML =
+        `<img
+          src="${escapeHTML(app.iconUrl)}"
+          alt=""
+        >`;
 
     }
-);
 
+    else if(app.icon){
 
-/* =====================================================
-   REFRESH
-===================================================== */
-
-refreshBtn.addEventListener(
-    "click",
-    function() {
-
-        loadApps();
+      iconHTML =
+        escapeHTML(app.icon);
 
     }
-);
 
+    else{
 
-/* =====================================================
-   HTML ESCAPE
-===================================================== */
-
-function escapeHTML(value) {
-
-    return String(value)
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
+      iconHTML =
+        escapeHTML(
+          (app.name || "A")
+          .charAt(0)
+          .toUpperCase()
         );
+
+    }
+
+
+    /* BADGES */
+
+    let badges = "";
+
+
+    if(app.category){
+
+      badges +=
+        `<span class="badge">
+          ${escapeHTML(app.category)}
+        </span>`;
+
+    }
+
+
+    if(app.featured){
+
+      badges +=
+        `<span class="badge">
+          Featured
+        </span>`;
+
+    }
+
+
+    if(app.latest){
+
+      badges +=
+        `<span class="badge">
+          Latest
+        </span>`;
+
+    }
+
+
+    /* HTML */
+
+    item.innerHTML = `
+
+      <div class="app-left">
+
+        <div class="app-icon">
+
+          ${iconHTML}
+
+        </div>
+
+
+        <div class="app-details">
+
+          <h3>
+            ${escapeHTML(
+              app.name || "Unnamed App"
+            )}
+          </h3>
+
+
+          <p>
+            ${escapeHTML(
+              app.description ||
+              "No description"
+            )}
+          </p>
+
+
+          <div class="badges">
+
+            ${badges}
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="app-actions">
+
+        <button
+          class="edit-button"
+          onclick="editApp('${app.id}')"
+        >
+          Edit
+        </button>
+
+
+        <button
+          class="delete-button"
+          onclick="deleteApp('${app.id}')"
+        >
+          Delete
+        </button>
+
+      </div>
+
+    `;
+
+
+    appsList.appendChild(item);
+
+  });
+
+}
+
+
+/* ================= EDIT APP ================= */
+
+window.editApp =
+  async function(id){
+
+    try{
+
+      const documentData =
+        await db
+          .collection("apps")
+          .doc(id)
+          .get();
+
+
+      if(!documentData.exists){
+
+        alert("App not found.");
+
+        return;
+
+      }
+
+
+      const app =
+        documentData.data();
+
+
+      document.getElementById(
+        "editId"
+      ).value = id;
+
+
+      document.getElementById(
+        "appName"
+      ).value =
+        app.name || "";
+
+
+      document.getElementById(
+        "category"
+      ).value =
+        app.category || "";
+
+
+      document.getElementById(
+        "description"
+      ).value =
+        app.description || "";
+
+
+      document.getElementById(
+        "version"
+      ).value =
+        app.version || "";
+
+
+      document.getElementById(
+        "size"
+      ).value =
+        app.size || "";
+
+
+      document.getElementById(
+        "androidVersion"
+      ).value =
+        app.androidVersion || "";
+
+
+      document.getElementById(
+        "downloads"
+      ).value =
+        app.downloads || 0;
+
+
+      document.getElementById(
+        "iconUrl"
+      ).value =
+        app.iconUrl || "";
+
+
+      document.getElementById(
+        "apkUrl"
+      ).value =
+        app.apkUrl || "";
+
+
+      document.getElementById(
+        "screenshots"
+      ).value =
+
+        Array.isArray(app.screenshots)
+
+        ? app.screenshots.join("\n")
+
+        : "";
+
+
+      document.getElementById(
+        "featured"
+      ).checked =
+        app.featured === true;
+
+
+      document.getElementById(
+        "latest"
+      ).checked =
+        app.latest === true;
+
+
+      formTitle.textContent =
+        "Edit App";
+
+
+      saveButton.textContent =
+        "UPDATE APP";
+
+
+      cancelButton.classList.remove(
+        "hidden"
+      );
+
+
+      window.scrollTo({
+
+        top:0,
+
+        behavior:"smooth"
+
+      });
+
+    }
+
+
+    catch(error){
+
+      console.error(error);
+
+      alert(
+        "Could not load app."
+      );
+
+    }
+
+  };
+
+
+/* ================= DELETE APP ================= */
+
+window.deleteApp =
+  async function(id){
+
+    const confirmDelete =
+      confirm(
+        "Are you sure you want to delete this app?"
+      );
+
+
+    if(!confirmDelete){
+
+      return;
+
+    }
+
+
+    try{
+
+      await db
+        .collection("apps")
+        .doc(id)
+        .delete();
+
+
+      await loadApps();
+
+    }
+
+
+    catch(error){
+
+      console.error(error);
+
+      alert(
+        "Delete failed."
+      );
+
+    }
+
+  };
+
+
+/* ================= CANCEL EDIT ================= */
+
+cancelButton.addEventListener(
+  "click",
+  function(){
+
+    resetForm();
+
+  }
+);
+
+
+/* ================= RESET FORM ================= */
+
+function resetForm(){
+
+  appForm.reset();
+
+
+  document.getElementById(
+    "editId"
+  ).value = "";
+
+
+  document.getElementById(
+    "downloads"
+  ).value = 0;
+
+
+  formTitle.textContent =
+    "Add New App";
+
+
+  saveButton.textContent =
+    "ADD APP";
+
+
+  cancelButton.classList.add(
+    "hidden"
+  );
+
+}
+
+
+/* ================= REFRESH ================= */
+
+refreshButton.addEventListener(
+  "click",
+  function(){
+
+    loadApps();
+
+  }
+);
+
+
+/* ================= HTML SECURITY ================= */
+
+function escapeHTML(value){
+
+  return String(value)
+
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
 
 }
