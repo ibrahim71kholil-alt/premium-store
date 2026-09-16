@@ -79,7 +79,7 @@ appForm.addEventListener("submit", async function(event){
     const file = fileInput.files[0];
     const githubUser = document.getElementById("githubUser").value.trim();
     const githubToken = document.getElementById("githubToken").value.trim();
-    const repoName = "PremiumStore-APKs"; 
+    const repoName = "PremiumStore-APK"; 
 
     if(!githubUser || !githubToken) {
       alert("GitHub Username and Token are required to upload files!");
