@@ -5,29 +5,72 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Premium Store - Best Apps</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* ওয়েবসাইটের ওপরের অংশ (Header & Hero) ঠিক করার জন্য স্টাইল */
+    body { margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f7f6; }
+    .top-header {
+      background-color: #374F4E;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+    }
+    .top-header .logo { font-weight: bold; font-size: 18px; display: flex; align-items: center; gap: 8px;}
+    .top-header .search-box input {
+      padding: 8px 15px;
+      border-radius: 20px;
+      border: none;
+      outline: none;
+      width: 180px;
+      font-size: 14px;
+    }
+    .hero-section {
+      background-color: #374F4E;
+      color: white;
+      text-align: center;
+      padding: 40px 20px;
+      margin-bottom: 20px;
+    }
+    .hero-section h1 { margin: 0 0 10px 0; font-size: 26px; }
+    .hero-section p { margin: 0; font-size: 14px; color: #d1d5db; }
+    .filters { display: flex; gap: 10px; padding: 0 20px; margin-bottom: 20px; overflow-x: auto; white-space: nowrap; }
+    .filter-btn { padding: 8px 15px; border-radius: 20px; border: 1px solid #ccc; background: white; cursor: pointer; font-size: 14px; color: #333;}
+    .filter-btn.active { background: #374F4E; color: white; border-color: #374F4E; }
+    .section-title { padding: 0 20px; margin-bottom: 15px; }
+    .section-title h2 { margin: 0; font-size: 20px; color: #1a1a1a; }
+    .container { max-width: 1000px; margin: 0 auto; }
+    footer { text-align: center; padding: 20px; color: #707782; font-size: 13px; margin-top: 20px;}
+    
+    /* সার্চ বারের জন্য রেস্পন্সিভ ডিজাইন */
+    @media (max-width: 600px) {
+      .top-header { flex-direction: row; gap: 10px; }
+      .top-header .search-box input { width: 140px; }
+    }
+  </style>
 </head>
 <body>
-  <!-- Header -->
-  <header class="main-header">
+
+  <!-- Top Header with Logo and Search -->
+  <div class="top-header">
     <div class="logo">◆ PREMIUM STORE</div>
     <div class="search-box">
       <input type="text" id="searchInput" placeholder="Search apps...">
     </div>
-  </header>
+  </div>
 
-  <!-- Hero Section -->
-  <section class="hero-section">
+  <!-- Hero Banner -->
+  <div class="hero-section">
     <h1>Welcome to Premium Store</h1>
     <p>Download the latest and best premium applications for free.</p>
-  </section>
+  </div>
 
-  <!-- Main Content -->
   <main class="container">
     <div class="section-title">
       <h2>Explore Apps</h2>
     </div>
     
-    <!-- Filters -->
+    <!-- Filter Buttons -->
     <div class="filters">
       <button class="filter-btn active" data-category="All">All</button>
       <button class="filter-btn" data-category="AI">AI</button>
@@ -38,22 +81,21 @@
       <button class="filter-btn" data-category="Other">Other</button>
     </div>
 
-    <!-- Apps Grid -->
+    <!-- App Cards Container -->
     <div id="appsGrid" class="apps-grid">
-      <!-- Apps will be loaded here dynamically by app.js -->
+      <!-- Apps will be loaded here from Firebase -->
     </div>
   </main>
 
-  <!-- Footer -->
   <footer>
     <p>&copy; 2026 Premium Store. All rights reserved.</p>
   </footer>
 
-  <!-- Firebase Scripts -->
+  <!-- Firebase Connection -->
   <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
   
-  <!-- Main App Script -->
+  <!-- App Functionality -->
   <script src="app.js"></script>
 
   <!-- Adsterra Income Code -->
