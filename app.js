@@ -1,5 +1,5 @@
 /* ==========================================
-   PREMIUM STORE - USER WEBSITE JS (Downloads Text Removed)
+   PREMIUM STORE - USER WEBSITE JS (Clickable Cards)
    ========================================== */
 
 const firebaseConfig = {
@@ -86,29 +86,24 @@ function renderUserApps(apps) {
       ? `<img src="${escapeHTML(app.iconUrl)}" alt="${escapeHTML(app.name)}">` 
       : escapeHTML((app.name || "A").charAt(0).toUpperCase());
     
-    // বাটন লজিক (টেলিগ্রাম / হোয়াটসঅ্যাপ / ডিরেক্ট লিংক)
     let buttonsHTML = '<div class="btn-group">';
-    if (app.telegramUrl) {
-      buttonsHTML += `<button class="btn-telegram" onclick="handleDownload('${app.id}', '${escapeHTML(app.telegramUrl)}')">✈️ Telegram</button>`;
-    }
-    if (app.whatsappUrl) {
-      buttonsHTML += `<button class="btn-whatsapp" onclick="handleDownload('${app.id}', '${escapeHTML(app.whatsappUrl)}')">💬 WhatsApp</button>`;
-    }
-    if (!app.telegramUrl && !app.whatsappUrl && app.apkUrl) {
-      buttonsHTML += `<button class="download-btn" onclick="handleDownload('${app.id}', '${escapeHTML(app.apkUrl)}')">Download APK</button>`;
-    }
+    if (app.telegramUrl) buttonsHTML += `<button class="btn-telegram" onclick="handleDownload('${app.id}', '${escapeHTML(app.telegramUrl)}')">✈️ Telegram</button>`;
+    if (app.whatsappUrl) buttonsHTML += `<button class="btn-whatsapp" onclick="handleDownload('${app.id}', '${escapeHTML(app.whatsappUrl)}')">💬 WhatsApp</button>`;
+    if (!app.telegramUrl && !app.whatsappUrl && app.apkUrl) buttonsHTML += `<button class="download-btn" onclick="handleDownload('${app.id}', '${escapeHTML(app.apkUrl)}')">Download APK</button>`;
     buttonsHTML += '</div>';
 
-    // এখান থেকে "0 Downloads" লেখাটি সরিয়ে শুধু App Size রাখা হয়েছে
+    // অ্যাপের ডেসক্রিপশন হোম পেজে একটু ছোট করে দেখাবে (যাতে কার্ডগুলো সমান থাকে)
+    let shortDesc = app.description.length > 70 ? app.description.substring(0, 70) + "..." : app.description;
+
     card.innerHTML = `
-      <div class="app-card-header">
+      <div class="app-card-header" onclick="window.location.href='details.html?id=${app.id}'" style="cursor:pointer;" title="Click to view full details">
         <div class="app-icon">${iconHTML}</div>
         <div class="app-info">
           <h4>${escapeHTML(app.name)}</h4>
           <span>${escapeHTML(app.category || "App")}</span>
         </div>
       </div>
-      <p class="app-desc">${escapeHTML(app.description)}</p>
+      <p class="app-desc" onclick="window.location.href='details.html?id=${app.id}'" style="cursor:pointer;">${escapeHTML(shortDesc)}</p>
       <div class="app-meta">
         <span>${escapeHTML(app.size || "Unknown Size")}</span>
       </div>
@@ -120,16 +115,6 @@ function renderUserApps(apps) {
 
 window.handleDownload = async function(appId, targetUrl) {
   window.open(targetUrl, '_blank');
-  // ব্যাকএন্ডে ডাউনলোডের হিসাব রাখার জন্য কাউন্টার চালু থাকলো (ভবিষ্যতে কাজে লাগতে পারে)
-  try {
-    await db.collection("apps").doc(appId).update({
-      downloads: firebase.firestore.FieldValue.increment(1)
-    });
-    const appIndex = allApps.findIndex(a => a.id === appId);
-    if(appIndex !== -1) {
-      allApps[appIndex].downloads = (allApps[appIndex].downloads || 0) + 1;
-    }
-  } catch(error) { console.error("Counter failed"); }
 };
 
 function escapeHTML(value) { return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
