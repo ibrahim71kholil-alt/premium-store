@@ -131,3 +131,34 @@ footer { text-align: center; padding: 20px; color: var(--muted); font-size: 14px
   .navbar { flex-direction: column; gap: 15px; }
   .search-bar input { width: 100%; }
 }
+/* Telegram and WhatsApp Buttons */
+.btn-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 5px;
+}
+.btn-telegram, .btn-whatsapp {
+  flex: 1;
+  text-align: center;
+  color: white;
+  text-decoration: none;
+  padding: 12px 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: 0.2s;
+  cursor: pointer;
+  border: none;
+  font-size: 14px;
+}
+.btn-telegram {
+  background-color: #0088cc; /* টেলিগ্রাম ব্লু */
+}
+.btn-telegram:hover {
+  background-color: #0077b5;
+}
+.btn-whatsapp {
+  background-color: #25D366; /* হোয়াটসঅ্যাপ গ্রিন */
+}
+.btn-whatsapp:hover {
+  background-color: #20b858;
+}
