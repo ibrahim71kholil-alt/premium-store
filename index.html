@@ -7,33 +7,28 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-  <!-- Navbar -->
-  <nav class="navbar">
-    <div class="logo">
-      <span class="logo-icon">◆</span>
-      <h1>PREMIUM STORE</h1>
-    </div>
-    <div class="search-bar">
+  <!-- Header -->
+  <header class="main-header">
+    <div class="logo">◆ PREMIUM STORE</div>
+    <div class="search-box">
       <input type="text" id="searchInput" placeholder="Search apps...">
     </div>
-  </nav>
+  </header>
 
   <!-- Hero Section -->
-  <header class="hero">
-    <h2>Welcome to Premium Store</h2>
+  <section class="hero-section">
+    <h1>Welcome to Premium Store</h1>
     <p>Download the latest and best premium applications for free.</p>
-  </header>
+  </section>
 
   <!-- Main Content -->
   <main class="container">
-    
     <div class="section-title">
-      <h3>Explore Apps</h3>
+      <h2>Explore Apps</h2>
     </div>
-
-    <!-- Category Filters -->
-    <div class="category-filters" id="categoryFilters">
+    
+    <!-- Filters -->
+    <div class="filters">
       <button class="filter-btn active" data-category="All">All</button>
       <button class="filter-btn" data-category="AI">AI</button>
       <button class="filter-btn" data-category="Tools">Tools</button>
@@ -44,21 +39,24 @@
     </div>
 
     <!-- Apps Grid -->
-    <div class="apps-grid" id="appsGrid">
-      <!-- JS দিয়ে এখানে স্কেলিটন বা অ্যাপ লোড হবে -->
+    <div id="appsGrid" class="apps-grid">
+      <!-- Apps will be loaded here dynamically by app.js -->
     </div>
-
   </main>
 
+  <!-- Footer -->
   <footer>
     <p>&copy; 2026 Premium Store. All rights reserved.</p>
   </footer>
 
-  <!-- Firebase SDK -->
+  <!-- Firebase Scripts -->
   <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
-<script src="https://pl31374249.profitableratecpmnetwork.com/1d/30/8d/1d308d008f39b503bd14acce9df36328.js"></script>
-  <!-- App JS -->
+  
+  <!-- Main App Script -->
   <script src="app.js"></script>
+
+  <!-- Adsterra Income Code -->
+  <script src="https://pl31374249.profitableratecpmnetwork.com/1d/30/8d/1d308d008f39b503bd14acce9df36328.js"></script>
 </body>
 </html>
