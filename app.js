@@ -1,9 +1,8 @@
 /* ==========================================
-   PREMIUM STORE - USER WEBSITE JS (UPDATED)
+   PREMIUM STORE - USER WEBSITE JS
    ========================================== */
 
 const firebaseConfig = {
-  // আপনার ফায়ারবেস কনফিগারেশন
   apiKey: "AIzaSyDNItGEILCV3ssNYSe2sSqa-4w40GfNsLs",
   authDomain: "premium-store-abb6f.firebaseapp.com",
   projectId: "premium-store-abb6f",
@@ -29,10 +28,7 @@ function showSkeletonLoader() {
       <div class="app-card">
         <div class="app-card-header">
           <div class="skeleton sk-icon"></div>
-          <div style="flex:1;">
-            <div class="skeleton sk-title"></div>
-            <div class="skeleton sk-tag"></div>
-          </div>
+          <div style="flex:1;"><div class="skeleton sk-title"></div><div class="skeleton sk-tag"></div></div>
         </div>
         <div class="skeleton sk-desc"></div>
         <div class="skeleton sk-btn"></div>
@@ -49,7 +45,7 @@ async function loadUserApps() {
     snapshot.forEach(doc => { allApps.push({ id: doc.id, ...doc.data() }); });
     filterAndRenderApps();
   } catch (error) {
-    appsGrid.innerHTML = '<div style="text-align:center; width:100%; color:red;">Failed to load apps. Check Firestore rules.</div>';
+    appsGrid.innerHTML = '<div style="text-align:center; width:100%; color:red;">Failed to load apps.</div>';
   }
 }
 
@@ -63,10 +59,7 @@ if (filterButtons.length > 0) {
     });
   });
 }
-
-if (searchInput) {
-  searchInput.addEventListener("input", filterAndRenderApps);
-}
+if (searchInput) searchInput.addEventListener("input", filterAndRenderApps);
 
 function filterAndRenderApps() {
   const searchTerm = searchInput ? searchInput.value.toLowerCase() : "";
@@ -93,26 +86,7 @@ function renderUserApps(apps) {
       ? `<img src="${escapeHTML(app.iconUrl)}" alt="${escapeHTML(app.name)}">` 
       : escapeHTML((app.name || "A").charAt(0).toUpperCase());
 
-    let sizeText = app.size ? escapeHTML(app.size) : "Unknown Size";
     let downloads = app.downloads ? app.downloads : 0;
-
-    // বাটন তৈরি করার লজিক (টেলিগ্রাম এবং হোয়াটসঅ্যাপ)
-    let buttonsHTML = '<div class="btn-group">';
-    
-    if (app.telegramUrl) {
-      buttonsHTML += `<button class="btn-telegram" onclick="handleDownload('${app.id}', '${escapeHTML(app.telegramUrl)}')">✈️ Telegram</button>`;
-    }
-    
-    if (app.whatsappUrl) {
-      buttonsHTML += `<button class="btn-whatsapp" onclick="handleDownload('${app.id}', '${escapeHTML(app.whatsappUrl)}')">💬 WhatsApp</button>`;
-    }
-    
-    // যদি কোনো অ্যাপে শুধু পুরনো ড্রাইভ লিংক (apkUrl) থাকে
-    if (!app.telegramUrl && !app.whatsappUrl && app.apkUrl) {
-      buttonsHTML += `<button class="download-btn" onclick="handleDownload('${app.id}', '${escapeHTML(app.apkUrl)}')">Download APK</button>`;
-    }
-    
-    buttonsHTML += '</div>';
 
     card.innerHTML = `
       <div class="app-card-header">
@@ -125,20 +99,20 @@ function renderUserApps(apps) {
       <p class="app-desc">${escapeHTML(app.description)}</p>
       <div class="app-meta">
         <span>📥 ${downloads} Downloads</span>
-        <span>${sizeText}</span>
+        <span>${escapeHTML(app.size || "Unknown Size")}</span>
       </div>
-      ${buttonsHTML}
+      <button class="download-btn" onclick="handleDownload('${app.id}', '${escapeHTML(app.apkUrl)}')">
+        Download APK
+      </button>
     `;
-
     appsGrid.appendChild(card);
   });
 }
 
 window.handleDownload = async function(appId, targetUrl) {
-  // লিংকে ক্লিক করলে নতুন ট্যাবে ওপেন করবে
-  window.open(targetUrl, '_blank');
+  // ডিরেক্ট ডাউনলোড লিংক
+  window.location.href = targetUrl;
   
-  // ফায়ারবেসে ডাউনলোড কাউন্ট ১ বাড়াবে
   try {
     await db.collection("apps").doc(appId).update({
       downloads: firebase.firestore.FieldValue.increment(1)
@@ -148,14 +122,9 @@ window.handleDownload = async function(appId, targetUrl) {
       allApps[appIndex].downloads = (allApps[appIndex].downloads || 0) + 1;
       filterAndRenderApps();
     }
-  } catch(error) {
-    console.error("Counter update failed", error);
-  }
+  } catch(error) { console.error("Counter failed"); }
 };
 
-function escapeHTML(value) {
-  return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-}
+function escapeHTML(value) { return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
 
-/* Start */
 loadUserApps();
