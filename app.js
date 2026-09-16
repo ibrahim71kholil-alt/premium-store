@@ -87,6 +87,19 @@ function renderUserApps(apps) {
       : escapeHTML((app.name || "A").charAt(0).toUpperCase());
 
     let downloads = app.downloads ? app.downloads : 0;
+    
+    // বাটন লজিক (টেলিগ্রাম / হোয়াটসঅ্যাপ / ডিরেক্ট লিংক)
+    let buttonsHTML = '<div class="btn-group">';
+    if (app.telegramUrl) {
+      buttonsHTML += `<button class="btn-telegram" onclick="handleDownload('${app.id}', '${escapeHTML(app.telegramUrl)}')">✈️ Telegram</button>`;
+    }
+    if (app.whatsappUrl) {
+      buttonsHTML += `<button class="btn-whatsapp" onclick="handleDownload('${app.id}', '${escapeHTML(app.whatsappUrl)}')">💬 WhatsApp</button>`;
+    }
+    if (!app.telegramUrl && !app.whatsappUrl && app.apkUrl) {
+      buttonsHTML += `<button class="download-btn" onclick="handleDownload('${app.id}', '${escapeHTML(app.apkUrl)}')">Download APK</button>`;
+    }
+    buttonsHTML += '</div>';
 
     card.innerHTML = `
       <div class="app-card-header">
@@ -101,18 +114,14 @@ function renderUserApps(apps) {
         <span>📥 ${downloads} Downloads</span>
         <span>${escapeHTML(app.size || "Unknown Size")}</span>
       </div>
-      <button class="download-btn" onclick="handleDownload('${app.id}', '${escapeHTML(app.apkUrl)}')">
-        Download APK
-      </button>
+      ${buttonsHTML}
     `;
     appsGrid.appendChild(card);
   });
 }
 
 window.handleDownload = async function(appId, targetUrl) {
-  // ডিরেক্ট ডাউনলোড লিংক
-  window.location.href = targetUrl;
-  
+  window.open(targetUrl, '_blank');
   try {
     await db.collection("apps").doc(appId).update({
       downloads: firebase.firestore.FieldValue.increment(1)
