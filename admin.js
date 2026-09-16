@@ -15,7 +15,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// আপনার আসল UID এখানে বসান
+// আপনার আসল UID এখানে বসানো হয়েছে
 const ADMIN_UID = "KdZ72nHmJrOEET2fVkRuHrSfPE93"; 
 
 const loginPage = document.getElementById("loginPage");
@@ -33,7 +33,7 @@ const appsList = document.getElementById("appsList");
 auth.onAuthStateChanged(function(user){
   if(user){
     if(user.uid !== ADMIN_UID){
-      loginMessage.innerHTML = `<span style="color:red;">UID Match Error!</span>`;
+      loginMessage.innerHTML = `<span style="color:red;">UID Match Error! You are not Admin.</span>`;
       auth.signOut();
       return;
     }
@@ -50,13 +50,15 @@ loginForm.addEventListener("submit", async function(event){
   event.preventDefault();
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
-  loginButton.disabled = true; loginButton.textContent = "LOGIN...";
+  loginButton.disabled = true; 
+  loginButton.textContent = "LOGIN...";
   try {
     await auth.signInWithEmailAndPassword(email, password);
   } catch(error) {
-    loginMessage.textContent = "Login failed: " + error.message;
+    loginMessage.innerHTML = `<span style="color:red;">Login failed: ${error.message}</span>`;
   } finally {
-    loginButton.disabled = false; loginButton.textContent = "LOGIN";
+    loginButton.disabled = false; 
+    loginButton.textContent = "LOGIN";
   }
 });
 
@@ -77,7 +79,7 @@ appForm.addEventListener("submit", async function(event){
     const file = fileInput.files[0];
     const githubUser = document.getElementById("githubUser").value.trim();
     const githubToken = document.getElementById("githubToken").value.trim();
-    const repoName = "PremiumStore-APKs"; // আপনার বানানো রিপোজিটরির নাম
+    const repoName = "PremiumStore-APKs"; 
 
     if(!githubUser || !githubToken) {
       alert("GitHub Username and Token are required to upload files!");
@@ -89,7 +91,6 @@ appForm.addEventListener("submit", async function(event){
       saveButton.textContent = "Step 1: Creating Release...";
       const tagName = 'v' + Date.now();
       
-      // Create Release
       const releaseRes = await fetch(`https://api.github.com/repos/${githubUser}/${repoName}/releases`, {
         method: 'POST',
         headers: {
@@ -102,7 +103,6 @@ appForm.addEventListener("submit", async function(event){
       
       if(!releaseData.upload_url) throw new Error("Could not create GitHub Release. Check your Token permissions.");
 
-      // Upload File
       saveButton.textContent = "Step 2: Uploading APK (Please wait)...";
       const uploadUrl = releaseData.upload_url.replace('{?name,label}', `?name=${encodeURIComponent(file.name)}`);
       
@@ -139,8 +139,8 @@ appForm.addEventListener("submit", async function(event){
     version: document.getElementById("version").value.trim(),
     size: document.getElementById("size").value.trim(),
     iconUrl: document.getElementById("iconUrl").value.trim(),
-    apkUrl: finalApkUrl, // ডিরেক্ট লিংক এখানে সেভ হবে
-    telegramUrl: "", // এগুলো আর দরকার নেই
+    apkUrl: finalApkUrl, 
+    telegramUrl: "", 
     whatsappUrl: "", 
     featured: document.getElementById("featured").checked,
     latest: document.getElementById("latest").checked,
