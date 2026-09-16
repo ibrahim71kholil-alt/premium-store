@@ -50,8 +50,8 @@
 
       <section class="admin-card">
         <div class="section-heading">
-          <h2>Add New App</h2>
-          <p>Add an application to Premium Store.</p>
+          <h2>Add / Upload New App</h2>
+          <p>Upload APK directly to GitHub Releases and add to Premium Store.</p>
         </div>
         <form id="appForm">
           <input type="hidden" id="editId">
@@ -76,43 +76,48 @@
             <label>Description *</label>
             <textarea id="description" rows="5" placeholder="Write app description..." required></textarea>
           </div>
+          
           <div class="two-column">
             <div class="form-group"><label>Version</label><input type="text" id="version" placeholder="1.0.0"></div>
             <div class="form-group"><label>App Size</label><input type="text" id="size" placeholder="25 MB"></div>
           </div>
-          <div class="two-column">
-            <div class="form-group"><label>Android Version</label><input type="text" id="androidVersion" placeholder="Android 7.0+"></div>
-            <div class="form-group"><label>Download Count</label><input type="number" id="downloads" min="0" value="0"></div>
-          </div>
+          
           <div class="form-group">
             <label>App Logo URL</label>
             <input type="url" id="iconUrl" placeholder="https://example.com/logo.png">
           </div>
 
-          <!-- NEW: Telegram and WhatsApp Links -->
-          <div class="two-column">
-            <div class="form-group">
-              <label>Telegram Link *</label>
-              <input type="url" id="telegramUrl" placeholder="https://t.me/..." required>
-              <small>টেলিগ্রাম পোস্টের লিংক দিন</small>
+          <!-- ================= NEW: GITHUB UPLOAD SECTION ================= -->
+          <div class="upload-box" style="background:#f4f7f6; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #d9d7d1;">
+            <h3 style="margin-bottom:10px; font-size:16px; color:#374F4E;">Upload APK (GitHub Releases)</h3>
+            <div class="two-column">
+              <div class="form-group">
+                <label>GitHub Username *</label>
+                <input type="text" id="githubUser" placeholder="e.g. ibrahim71kholil-alt">
+              </div>
+              <div class="form-group">
+                <label>GitHub Token (Secret) *</label>
+                <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxx">
+              </div>
             </div>
             <div class="form-group">
-              <label>WhatsApp Link</label>
-              <input type="url" id="whatsappUrl" placeholder="https://whatsapp.com/channel/...">
-              <small>হোয়াটসঅ্যাপের লিংক দিন (ঐচ্ছিক)</small>
+              <label>Select APK File</label>
+              <input type="file" id="apkFile" accept=".apk">
+              <small style="color:#707782;">ফাইল সিলেক্ট করলে এটি অটোমেটিক গিটহাবে আপলোড হয়ে লিংক তৈরি হবে।</small>
+            </div>
+            <div class="form-group">
+              <label>Or Direct Download URL (If already uploaded)</label>
+              <input type="url" id="directApkUrl" placeholder="https://...">
             </div>
           </div>
+          <!-- ========================================================== -->
 
-          <div class="form-group">
-            <label>Screenshot URLs</label>
-            <textarea id="screenshots" rows="4" placeholder="প্রতি লাইনে একটি করে image URL দিন"></textarea>
-          </div>
           <div class="checkbox-area">
             <label class="check-item"><input type="checkbox" id="featured"><span>Featured App</span></label>
             <label class="check-item"><input type="checkbox" id="latest"><span>Latest App</span></label>
           </div>
           <div class="form-buttons">
-            <button type="submit" class="main-button" id="saveButton">ADD APP</button>
+            <button type="submit" class="main-button" id="saveButton">ADD & UPLOAD APP</button>
             <button type="button" class="cancel-button hidden" id="cancelButton">CANCEL</button>
           </div>
           <p id="formMessage" class="message"></p>
