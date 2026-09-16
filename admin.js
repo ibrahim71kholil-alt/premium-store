@@ -1,5 +1,5 @@
 /* ==========================================
-   PREMIUM STORE - ADMIN PANEL JS (WITH GITHUB UPLOAD)
+   PREMIUM STORE - ADMIN PANEL JS (PREVIOUS VERSION)
    ========================================== */
 
 const firebaseConfig = {
@@ -10,12 +10,11 @@ const firebaseConfig = {
   messagingSenderId: "706337940165",
   appId: "1:706337940165:web:183f9ef3e9ab23a93606ac"
 };
-
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// আপনার আসল UID এখানে বসানো হয়েছে
+// আপনার আসল UID
 const ADMIN_UID = "KdZ72nHmJrOEET2fVkRuHrSfPE93"; 
 
 const loginPage = document.getElementById("loginPage");
@@ -50,15 +49,13 @@ loginForm.addEventListener("submit", async function(event){
   event.preventDefault();
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
-  loginButton.disabled = true; 
-  loginButton.textContent = "LOGIN...";
+  loginButton.disabled = true; loginButton.textContent = "LOGIN...";
   try {
     await auth.signInWithEmailAndPassword(email, password);
   } catch(error) {
     loginMessage.innerHTML = `<span style="color:red;">Login failed: ${error.message}</span>`;
   } finally {
-    loginButton.disabled = false; 
-    loginButton.textContent = "LOGIN";
+    loginButton.disabled = false; loginButton.textContent = "LOGIN";
   }
 });
 
@@ -66,72 +63,9 @@ logoutButton.addEventListener("click", async () => await auth.signOut());
 
 appForm.addEventListener("submit", async function(event){
   event.preventDefault();
-  
-  saveButton.disabled = true; 
-  formMessage.style.color = "blue";
+  saveButton.disabled = true; saveButton.textContent = "Saving..."; formMessage.textContent = "";
   
   const editId = document.getElementById("editId").value.trim();
-  let finalApkUrl = document.getElementById("directApkUrl").value.trim();
-  const fileInput = document.getElementById("apkFile");
-
-  // ================= GITHUB UPLOAD LOGIC =================
-  if (fileInput.files.length > 0) {
-    const file = fileInput.files[0];
-    const githubUser = document.getElementById("githubUser").value.trim();
-    const githubToken = document.getElementById("githubToken").value.trim();
-    const repoName = "PremiumStore-APK"; 
-
-    if(!githubUser || !githubToken) {
-      alert("GitHub Username and Token are required to upload files!");
-      saveButton.disabled = false;
-      return;
-    }
-
-    try {
-      saveButton.textContent = "Step 1: Creating Release...";
-      const tagName = 'v' + Date.now();
-      
-      const releaseRes = await fetch(`https://api.github.com/repos/${githubUser}/${repoName}/releases`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `token ${githubToken}`,
-          'Accept': 'application/vnd.github.v3+json'
-        },
-        body: JSON.stringify({ tag_name: tagName, name: `${file.name}`, draft: false, prerelease: false })
-      });
-      const releaseData = await releaseRes.json();
-      
-      if(!releaseData.upload_url) throw new Error("Could not create GitHub Release. Check your Token permissions.");
-
-      saveButton.textContent = "Step 2: Uploading APK (Please wait)...";
-      const uploadUrl = releaseData.upload_url.replace('{?name,label}', `?name=${encodeURIComponent(file.name)}`);
-      
-      const uploadRes = await fetch(uploadUrl, {
-        method: 'POST',
-        headers: {
-          'Authorization': `token ${githubToken}`,
-          'Content-Type': 'application/vnd.android.package-archive'
-        },
-        body: file
-      });
-      
-      const uploadData = await uploadRes.json();
-      if(!uploadData.browser_download_url) throw new Error("File upload failed.");
-      
-      finalApkUrl = uploadData.browser_download_url;
-      formMessage.textContent = "APK Uploaded Successfully!";
-      
-    } catch(error) {
-      alert("Error: " + error.message);
-      saveButton.disabled = false;
-      saveButton.textContent = "ADD & UPLOAD APP";
-      return;
-    }
-  }
-
-  // ================= SAVE TO FIREBASE =================
-  saveButton.textContent = "Saving to Database...";
-  
   const appData = {
     name: document.getElementById("appName").value.trim(),
     category: document.getElementById("category").value,
@@ -139,9 +73,9 @@ appForm.addEventListener("submit", async function(event){
     version: document.getElementById("version").value.trim(),
     size: document.getElementById("size").value.trim(),
     iconUrl: document.getElementById("iconUrl").value.trim(),
-    apkUrl: finalApkUrl, 
-    telegramUrl: "", 
-    whatsappUrl: "", 
+    telegramUrl: document.getElementById("telegramUrl").value.trim(),
+    whatsappUrl: document.getElementById("whatsappUrl").value.trim(),
+    apkUrl: document.getElementById("apkUrl").value.trim(),
     featured: document.getElementById("featured").checked,
     latest: document.getElementById("latest").checked,
     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -150,23 +84,19 @@ appForm.addEventListener("submit", async function(event){
   try {
     if(editId){
       await db.collection("apps").doc(editId).update(appData);
-      formMessage.style.color = "green";
-      formMessage.textContent = "App updated successfully.";
+      formMessage.style.color = "green"; formMessage.textContent = "App updated successfully.";
     } else {
       appData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
       appData.downloads = 0;
       await db.collection("apps").add(appData);
-      formMessage.style.color = "green";
-      formMessage.textContent = "App added successfully.";
+      formMessage.style.color = "green"; formMessage.textContent = "App added successfully.";
     }
     resetForm();
     await loadApps();
   } catch(error) {
-    formMessage.style.color = "red";
-    formMessage.textContent = "Error saving app to Firebase.";
+    formMessage.style.color = "red"; formMessage.textContent = "Error saving app to Firebase.";
   } finally {
-    saveButton.disabled = false; 
-    saveButton.textContent = "ADD & UPLOAD APP";
+    saveButton.disabled = false; saveButton.textContent = "SAVE APP";
   }
 });
 
@@ -219,7 +149,9 @@ window.editApp = async function(id){
     document.getElementById("version").value = app.version || "";
     document.getElementById("size").value = app.size || "";
     document.getElementById("iconUrl").value = app.iconUrl || "";
-    document.getElementById("directApkUrl").value = app.apkUrl || "";
+    document.getElementById("telegramUrl").value = app.telegramUrl || "";
+    document.getElementById("whatsappUrl").value = app.whatsappUrl || "";
+    document.getElementById("apkUrl").value = app.apkUrl || "";
     document.getElementById("featured").checked = app.featured === true;
     document.getElementById("latest").checked = app.latest === true;
     
@@ -230,7 +162,7 @@ window.editApp = async function(id){
 };
 
 window.deleteApp = async function(id){
-  if(confirm("Are you sure you want to delete this app from Firebase? (Note: GitHub file remains unless deleted manually)")){
+  if(confirm("Are you sure you want to delete this app?")){
     await db.collection("apps").doc(id).delete();
     await loadApps();
   }
@@ -242,9 +174,8 @@ cancelButton.addEventListener("click", resetForm);
 function resetForm(){
   appForm.reset();
   document.getElementById("editId").value = "";
-  saveButton.textContent = "ADD & UPLOAD APP";
+  saveButton.textContent = "SAVE APP";
   cancelButton.classList.add("hidden");
-  document.getElementById("apkFile").value = "";
 }
 
 function escapeHTML(value){
