@@ -2,571 +2,136 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PREMIUM STORE — Admin</title>
-
-  <!-- ADMIN CSS -->
   <link rel="stylesheet" href="admin.css">
 </head>
-
 <body>
-
   <!-- ================= LOGIN PAGE ================= -->
-
   <section id="loginPage" class="login-page">
-
     <div class="login-card">
-
       <div class="logo-mark">◆</div>
-
       <h1>PREMIUM STORE</h1>
-
-      <p class="admin-label">
-        ADMIN PANEL
-      </p>
-
+      <p class="admin-label">ADMIN PANEL</p>
       <form id="loginForm">
-
         <div class="input-group">
-
-          <label for="email">
-            Admin Email
-          </label>
-
-          <input
-            type="email"
-            id="email"
-            placeholder="Enter admin email"
-            required
-          >
-
+          <label>Admin Email</label>
+          <input type="email" id="email" placeholder="Enter admin email" required>
         </div>
-
-
         <div class="input-group">
-
-          <label for="password">
-            Password
-          </label>
-
-          <input
-            type="password"
-            id="password"
-            placeholder="Enter password"
-            required
-          >
-
+          <label>Password</label>
+          <input type="password" id="password" placeholder="Enter password" required>
         </div>
-
-
-        <button
-          type="submit"
-          class="main-button"
-          id="loginButton"
-        >
-          LOGIN
-        </button>
-
-        <p
-          id="loginMessage"
-          class="message"
-        ></p>
-
+        <button type="submit" class="main-button" id="loginButton">LOGIN</button>
+        <p id="loginMessage" class="message"></p>
       </form>
-
     </div>
-
   </section>
-
-
 
   <!-- ================= ADMIN DASHBOARD ================= -->
-
-  <section
-    id="dashboardPage"
-    class="dashboard-page hidden"
-  >
-
-    <!-- HEADER -->
-
+  <section id="dashboardPage" class="dashboard-page hidden">
     <header class="admin-header">
-
       <div class="brand">
-
-        <div class="small-logo">
-          ◆
-        </div>
-
+        <div class="small-logo">◆</div>
         <div>
-
           <h2>PREMIUM STORE</h2>
-
-          <span>
-            ADMIN PANEL
-          </span>
-
+          <span>ADMIN PANEL</span>
         </div>
-
       </div>
-
-
-      <button
-        id="logoutButton"
-        class="logout-button"
-      >
-        Logout
-      </button>
-
+      <button id="logoutButton" class="logout-button">Logout</button>
     </header>
 
-
-
-    <!-- MAIN -->
-
     <main class="admin-container">
-
-
-      <!-- ================= STATS ================= -->
-
       <section class="stats-grid">
-
-        <div class="stat-card">
-
-          <span>
-            Total Apps
-          </span>
-
-          <strong id="totalApps">
-            0
-          </strong>
-
-        </div>
-
-
-        <div class="stat-card">
-
-          <span>
-            Featured Apps
-          </span>
-
-          <strong id="featuredApps">
-            0
-          </strong>
-
-        </div>
-
-
-        <div class="stat-card">
-
-          <span>
-            Latest Apps
-          </span>
-
-          <strong id="latestApps">
-            0
-          </strong>
-
-        </div>
-
+        <div class="stat-card"><span>Total Apps</span><strong id="totalApps">0</strong></div>
+        <div class="stat-card"><span>Featured Apps</span><strong id="featuredApps">0</strong></div>
+        <div class="stat-card"><span>Latest Apps</span><strong id="latestApps">0</strong></div>
       </section>
 
-
-
-      <!-- ================= ADD APP ================= -->
-
       <section class="admin-card">
-
         <div class="section-heading">
-
-          <div>
-
-            <h2 id="formTitle">
-              Add New App
-            </h2>
-
-            <p>
-              Add an application to Premium Store.
-            </p>
-
-          </div>
-
+          <h2>Add New App</h2>
+          <p>Add an application to Premium Store.</p>
         </div>
-
-
         <form id="appForm">
-
-          <!-- Hidden Edit ID -->
-
-          <input
-            type="hidden"
-            id="editId"
-          >
-
-
-          <!-- APP NAME -->
-
+          <input type="hidden" id="editId">
           <div class="form-group">
-
-            <label>
-              App Name *
-            </label>
-
-            <input
-              type="text"
-              id="appName"
-              placeholder="Example: AI Assistant"
-              required
-            >
-
+            <label>App Name *</label>
+            <input type="text" id="appName" placeholder="Example: AI Assistant" required>
           </div>
-
-
-
-          <!-- CATEGORY -->
-
           <div class="form-group">
-
-            <label>
-              Category *
-            </label>
-
-            <select
-              id="category"
-              required
-            >
-
-              <option value="">
-                Select Category
-              </option>
-
-              <option value="AI">
-                AI
-              </option>
-
-              <option value="Education">
-                Education
-              </option>
-
-              <option value="Entertainment">
-                Entertainment
-              </option>
-
-              <option value="Social">
-                Social
-              </option>
-
-              <option value="Tools">
-                Tools
-              </option>
-
-              <option value="Photo & Video">
-                Photo & Video
-              </option>
-
-              <option value="Security">
-                Security
-              </option>
-
-              <option value="Other">
-                Other
-              </option>
-
+            <label>Category *</label>
+            <select id="category" required>
+              <option value="">Select Category</option>
+              <option value="AI">AI</option>
+              <option value="Education">Education</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="Social">Social</option>
+              <option value="Tools">Tools</option>
+              <option value="Security">Security</option>
+              <option value="Other">Other</option>
             </select>
-
           </div>
-
-
-
-          <!-- DESCRIPTION -->
-
           <div class="form-group">
-
-            <label>
-              Description *
-            </label>
-
-            <textarea
-              id="description"
-              rows="5"
-              placeholder="Write app description..."
-              required
-            ></textarea>
-
+            <label>Description *</label>
+            <textarea id="description" rows="5" placeholder="Write app description..." required></textarea>
           </div>
-
-
-
-          <!-- VERSION + SIZE -->
-
           <div class="two-column">
-
-            <div class="form-group">
-
-              <label>
-                Version
-              </label>
-
-              <input
-                type="text"
-                id="version"
-                placeholder="1.0.0"
-              >
-
-            </div>
-
-
-            <div class="form-group">
-
-              <label>
-                App Size
-              </label>
-
-              <input
-                type="text"
-                id="size"
-                placeholder="25 MB"
-              >
-
-            </div>
-
+            <div class="form-group"><label>Version</label><input type="text" id="version" placeholder="1.0.0"></div>
+            <div class="form-group"><label>App Size</label><input type="text" id="size" placeholder="25 MB"></div>
           </div>
-
-
-
-          <!-- ANDROID + DOWNLOADS -->
-
           <div class="two-column">
+            <div class="form-group"><label>Android Version</label><input type="text" id="androidVersion" placeholder="Android 7.0+"></div>
+            <div class="form-group"><label>Download Count</label><input type="number" id="downloads" min="0" value="0"></div>
+          </div>
+          <div class="form-group">
+            <label>App Logo URL</label>
+            <input type="url" id="iconUrl" placeholder="https://example.com/logo.png">
+          </div>
 
+          <!-- NEW: Telegram and WhatsApp Links -->
+          <div class="two-column">
             <div class="form-group">
-
-              <label>
-                Android Version
-              </label>
-
-              <input
-                type="text"
-                id="androidVersion"
-                placeholder="Android 7.0+"
-              >
-
+              <label>Telegram Link *</label>
+              <input type="url" id="telegramUrl" placeholder="https://t.me/..." required>
+              <small>টেলিগ্রাম পোস্টের লিংক দিন</small>
             </div>
-
-
             <div class="form-group">
-
-              <label>
-                Download Count
-              </label>
-
-              <input
-                type="number"
-                id="downloads"
-                min="0"
-                value="0"
-              >
-
+              <label>WhatsApp Link</label>
+              <input type="url" id="whatsappUrl" placeholder="https://whatsapp.com/channel/...">
+              <small>হোয়াটসঅ্যাপের লিংক দিন (ঐচ্ছিক)</small>
             </div>
-
           </div>
-
-
-
-          <!-- LOGO -->
 
           <div class="form-group">
-
-            <label>
-              App Logo URL
-            </label>
-
-            <input
-              type="url"
-              id="iconUrl"
-              placeholder="https://example.com/logo.png"
-            >
-
-            <small>
-              Direct image URL দিন।
-            </small>
-
+            <label>Screenshot URLs</label>
+            <textarea id="screenshots" rows="4" placeholder="প্রতি লাইনে একটি করে image URL দিন"></textarea>
           </div>
-
-
-
-          <!-- APK -->
-
-          <div class="form-group">
-
-            <label>
-              APK Download URL *
-            </label>
-
-            <input
-              type="url"
-              id="apkUrl"
-              placeholder="https://example.com/app.apk"
-              required
-            >
-
-            <small>
-              এখানে APK file-এর direct download link দিন।
-            </small>
-
-          </div>
-
-
-
-          <!-- SCREENSHOTS -->
-
-          <div class="form-group">
-
-            <label>
-              Screenshot URLs
-            </label>
-
-            <textarea
-              id="screenshots"
-              rows="4"
-              placeholder="প্রতি লাইনে একটি করে image URL দিন"
-            ></textarea>
-
-          </div>
-
-
-
-          <!-- CHECKBOX -->
-
           <div class="checkbox-area">
-
-            <label class="check-item">
-
-              <input
-                type="checkbox"
-                id="featured"
-              >
-
-              <span>
-                Featured App
-              </span>
-
-            </label>
-
-
-            <label class="check-item">
-
-              <input
-                type="checkbox"
-                id="latest"
-              >
-
-              <span>
-                Latest App
-              </span>
-
-            </label>
-
+            <label class="check-item"><input type="checkbox" id="featured"><span>Featured App</span></label>
+            <label class="check-item"><input type="checkbox" id="latest"><span>Latest App</span></label>
           </div>
-
-
-
-          <!-- BUTTONS -->
-
           <div class="form-buttons">
-
-            <button
-              type="submit"
-              class="main-button"
-              id="saveButton"
-            >
-              ADD APP
-            </button>
-
-
-            <button
-              type="button"
-              class="cancel-button hidden"
-              id="cancelButton"
-            >
-              CANCEL
-            </button>
-
+            <button type="submit" class="main-button" id="saveButton">ADD APP</button>
+            <button type="button" class="cancel-button hidden" id="cancelButton">CANCEL</button>
           </div>
-
-
-          <p
-            id="formMessage"
-            class="message"
-          ></p>
-
+          <p id="formMessage" class="message"></p>
         </form>
-
       </section>
-
-
-
-      <!-- ================= APP LIST ================= -->
 
       <section class="admin-card">
-
         <div class="list-heading">
-
-          <div>
-
-            <h2>
-              Your Apps
-            </h2>
-
-            <p>
-              Manage apps available on Premium Store.
-            </p>
-
-          </div>
-
-
-          <button
-            id="refreshButton"
-            class="refresh-button"
-          >
-            Refresh
-          </button>
-
+          <h2>Your Apps</h2>
+          <button id="refreshButton" class="refresh-button">Refresh</button>
         </div>
-
-
-        <div id="appsList">
-
-          <div class="loading">
-            Loading apps...
-          </div>
-
-        </div>
-
+        <div id="appsList"><div class="loading">Loading apps...</div></div>
       </section>
-
-
     </main>
-
   </section>
 
-
-
-  <!-- ================= FIREBASE ================= -->
-
   <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
-
   <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
-
   <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
-
-
-  <!-- ADMIN JAVASCRIPT -->
-
   <script src="admin.js"></script>
-
 </body>
 </html>
