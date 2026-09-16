@@ -1,5 +1,5 @@
 /* ==========================================
-   PREMIUM STORE - USER WEBSITE JS
+   PREMIUM STORE - USER WEBSITE JS (Downloads Text Removed)
    ========================================== */
 
 const firebaseConfig = {
@@ -85,8 +85,6 @@ function renderUserApps(apps) {
     let iconHTML = app.iconUrl 
       ? `<img src="${escapeHTML(app.iconUrl)}" alt="${escapeHTML(app.name)}">` 
       : escapeHTML((app.name || "A").charAt(0).toUpperCase());
-
-    let downloads = app.downloads ? app.downloads : 0;
     
     // বাটন লজিক (টেলিগ্রাম / হোয়াটসঅ্যাপ / ডিরেক্ট লিংক)
     let buttonsHTML = '<div class="btn-group">';
@@ -101,6 +99,7 @@ function renderUserApps(apps) {
     }
     buttonsHTML += '</div>';
 
+    // এখান থেকে "0 Downloads" লেখাটি সরিয়ে শুধু App Size রাখা হয়েছে
     card.innerHTML = `
       <div class="app-card-header">
         <div class="app-icon">${iconHTML}</div>
@@ -111,7 +110,6 @@ function renderUserApps(apps) {
       </div>
       <p class="app-desc">${escapeHTML(app.description)}</p>
       <div class="app-meta">
-        <span>📥 ${downloads} Downloads</span>
         <span>${escapeHTML(app.size || "Unknown Size")}</span>
       </div>
       ${buttonsHTML}
@@ -122,6 +120,7 @@ function renderUserApps(apps) {
 
 window.handleDownload = async function(appId, targetUrl) {
   window.open(targetUrl, '_blank');
+  // ব্যাকএন্ডে ডাউনলোডের হিসাব রাখার জন্য কাউন্টার চালু থাকলো (ভবিষ্যতে কাজে লাগতে পারে)
   try {
     await db.collection("apps").doc(appId).update({
       downloads: firebase.firestore.FieldValue.increment(1)
@@ -129,7 +128,6 @@ window.handleDownload = async function(appId, targetUrl) {
     const appIndex = allApps.findIndex(a => a.id === appId);
     if(appIndex !== -1) {
       allApps[appIndex].downloads = (allApps[appIndex].downloads || 0) + 1;
-      filterAndRenderApps();
     }
   } catch(error) { console.error("Counter failed"); }
 };
