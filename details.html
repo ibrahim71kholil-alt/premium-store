@@ -1,83 +1,47 @@
-/* ==========================================
-   PREMIUM STORE - APP DETAILS JS
-   ========================================== */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>App Details - Premium Store</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f7f6; margin: 0; padding: 0; }
+    .main-header { background: #374F4E; padding: 20px; color: white; text-align: center; }
+    .details-container { max-width: 800px; margin: 40px auto; padding: 25px; background: #fff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .details-header { display: flex; gap: 20px; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
+    .details-icon { width: 100px; height: 100px; border-radius: 20px; object-fit: cover; background: #f4f7f6; display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; color: #374F4E; }
+    .details-icon img { width: 100%; height: 100%; border-radius: 20px; }
+    .details-title h1 { margin: 0 0 5px 0; font-size: 26px; color: #1a1a1a; }
+    .details-title p { margin: 0; color: #707782; font-size: 15px; }
+    .details-body h3 { margin-bottom: 15px; color: #374F4E; font-size: 20px; }
+    .details-body p { color: #4a5568; line-height: 1.7; white-space: pre-wrap; font-size: 15px;}
+    .meta-info { display: flex; gap: 20px; margin: 20px 0; padding: 15px 20px; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0; }
+    .meta-item { display: flex; flex-direction: column; }
+    .meta-item span { font-size: 13px; color: #707782; margin-bottom: 4px;}
+    .meta-item strong { color: #1a1a1a; font-size: 16px; }
+    .back-btn { display: inline-flex; align-items: center; margin-bottom: 20px; color: #374F4E; text-decoration: none; font-weight: 600; font-size: 16px; padding: 8px 15px; background: #fff; border: 1px solid #374F4E; border-radius: 8px;}
+    .download-section { margin-top: 30px; border-top: 1px solid #eee; padding-top: 25px; display: flex; flex-direction: column; gap: 10px; }
+    .btn-telegram { background: #0088cc; color: #fff; padding: 15px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; text-align: center; }
+    .btn-whatsapp { background: #25D366; color: #fff; padding: 15px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; text-align: center; }
+    .download-btn { background: #374F4E; color: #fff; padding: 15px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; text-align: center; }
+  </style>
+</head>
+<body>
+  <header class="main-header">
+    <div class="logo">◆ PREMIUM STORE</div>
+  </header>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDNItGEILCV3ssNYSe2sSqa-4w40GfNsLs",
-  authDomain: "premium-store-abb6f.firebaseapp.com",
-  projectId: "premium-store-abb6f",
-  storageBucket: "premium-store-abb6f.firebasestorage.app",
-  messagingSenderId: "706337940165",
-  appId: "1:706337940165:web:183f9ef3e9ab23a93606ac"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-const appDetailsContainer = document.getElementById("appDetails");
-// URL থেকে অ্যাপের ID বের করা
-const urlParams = new URLSearchParams(window.location.search);
-const appId = urlParams.get('id');
-
-if (!appId) {
-  appDetailsContainer.innerHTML = '<div style="color:red; text-align:center; padding: 40px;">App ID not found! Please go back.</div>';
-} else {
-  loadAppDetails();
-}
-
-async function loadAppDetails() {
-  try {
-    const doc = await db.collection("apps").doc(appId).get();
-    if (!doc.exists) {
-      appDetailsContainer.innerHTML = '<div style="color:red; text-align:center; padding: 40px;">App not found! It might have been deleted.</div>';
-      return;
-    }
-    const app = doc.data();
-    renderDetails(app, appId);
-  } catch (error) {
-    appDetailsContainer.innerHTML = '<div style="color:red; text-align:center; padding: 40px;">Error loading details. Please check your connection.</div>';
-  }
-}
-
-function renderDetails(app, id) {
-  let iconHTML = app.iconUrl 
-    ? `<img src="${escapeHTML(app.iconUrl)}" alt="${escapeHTML(app.name)}">` 
-    : escapeHTML((app.name || "A").charAt(0).toUpperCase());
-
-  let buttonsHTML = '<div class="btn-group" style="width: 100%;">';
-  if (app.telegramUrl) buttonsHTML += `<button class="btn-telegram" style="width:100%; padding:15px; font-size:16px;" onclick="handleDownload('${id}', '${escapeHTML(app.telegramUrl)}')">✈️ Download via Telegram</button>`;
-  if (app.whatsappUrl) buttonsHTML += `<button class="btn-whatsapp" style="width:100%; padding:15px; font-size:16px;" onclick="handleDownload('${id}', '${escapeHTML(app.whatsappUrl)}')">💬 Download via WhatsApp</button>`;
-  if (!app.telegramUrl && !app.whatsappUrl && app.apkUrl) buttonsHTML += `<button class="download-btn" style="width:100%; padding:15px; font-size:16px;" onclick="handleDownload('${id}', '${escapeHTML(app.apkUrl)}')">📥 Download APK</button>`;
-  buttonsHTML += '</div>';
-
-  appDetailsContainer.innerHTML = `
-    <div class="details-header">
-      <div class="details-icon">${iconHTML}</div>
-      <div class="details-title">
-        <h1>${escapeHTML(app.name)}</h1>
-        <p>${escapeHTML(app.category || "App")}</p>
-      </div>
-    </div>
+  <main style="padding: 20px; max-width: 800px; margin: 0 auto;">
+    <a href="index.html" class="back-btn">← Back to Home</a>
     
-    <div class="meta-info">
-      <div class="meta-item"><span>Version</span><strong>${escapeHTML(app.version || "Latest")}</strong></div>
-      <div class="meta-item"><span>Size</span><strong>${escapeHTML(app.size || "Unknown")}</strong></div>
-      <div class="meta-item"><span>Developer</span><strong>Premium Store</strong></div>
+    <div id="appDetails" class="details-container">
+      <div style="text-align:center; padding: 40px; color: #707782;">Loading app details...</div>
     </div>
+  </main>
 
-    <div class="details-body">
-      <h3>About this App</h3>
-      <p>${escapeHTML(app.description)}</p>
-    </div>
-    
-    <div class="download-section">
-      ${buttonsHTML}
-    </div>
-  `;
-}
-
-window.handleDownload = async function(appId, targetUrl) {
-  window.open(targetUrl, '_blank');
-  try { await db.collection("apps").doc(appId).update({ downloads: firebase.firestore.FieldValue.increment(1) }); } catch(e) {}
-};
-
-function escapeHTML(value) { return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
+  <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
+  <!-- নিচে আমরা details.js ফাইলটিকে কল করছি -->
+  <script src="details.js"></script>
+</body>
+</html>
