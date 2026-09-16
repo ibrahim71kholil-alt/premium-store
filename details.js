@@ -1,0 +1,81 @@
+/* ==========================================
+   PREMIUM STORE - APP DETAILS JS
+   ========================================== */
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDNItGEILCV3ssNYSe2sSqa-4w40GfNsLs",
+  authDomain: "premium-store-abb6f.firebaseapp.com",
+  projectId: "premium-store-abb6f",
+  storageBucket: "premium-store-abb6f.firebasestorage.app",
+  messagingSenderId: "706337940165",
+  appId: "1:706337940165:web:183f9ef3e9ab23a93606ac"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+const appDetailsContainer = document.getElementById("appDetails");
+const urlParams = new URLSearchParams(window.location.search);
+const appId = urlParams.get('id');
+
+if (!appId) {
+  appDetailsContainer.innerHTML = '<div style="color:red; text-align:center; padding: 40px;">App ID not found! Please go back.</div>';
+} else {
+  loadAppDetails();
+}
+
+async function loadAppDetails() {
+  try {
+    const doc = await db.collection("apps").doc(appId).get();
+    if (!doc.exists) {
+      appDetailsContainer.innerHTML = '<div style="color:red; text-align:center; padding: 40px;">App not found! It might have been deleted.</div>';
+      return;
+    }
+    const app = doc.data();
+    renderDetails(app, appId);
+  } catch (error) {
+    appDetailsContainer.innerHTML = '<div style="color:red; text-align:center; padding: 40px;">Error loading details. Please check your connection.</div>';
+  }
+}
+
+function renderDetails(app, id) {
+  let iconHTML = app.iconUrl 
+    ? `<img src="${escapeHTML(app.iconUrl)}" alt="${escapeHTML(app.name)}">` 
+    : escapeHTML((app.name || "A").charAt(0).toUpperCase());
+
+  let buttonsHTML = '';
+  if (app.telegramUrl) buttonsHTML += `<button class="btn-telegram" onclick="handleDownload('${id}', '${escapeHTML(app.telegramUrl)}')">✈️ Download via Telegram</button>`;
+  if (app.whatsappUrl) buttonsHTML += `<button class="btn-whatsapp" onclick="handleDownload('${id}', '${escapeHTML(app.whatsappUrl)}')">💬 Download via WhatsApp</button>`;
+  if (!app.telegramUrl && !app.whatsappUrl && app.apkUrl) buttonsHTML += `<button class="download-btn" onclick="handleDownload('${id}', '${escapeHTML(app.apkUrl)}')">📥 Download APK</button>`;
+
+  appDetailsContainer.innerHTML = `
+    <div class="details-header">
+      <div class="details-icon">${iconHTML}</div>
+      <div class="details-title">
+        <h1>${escapeHTML(app.name)}</h1>
+        <p>${escapeHTML(app.category || "App")}</p>
+      </div>
+    </div>
+    
+    <div class="meta-info">
+      <div class="meta-item"><span>Version</span><strong>${escapeHTML(app.version || "Latest")}</strong></div>
+      <div class="meta-item"><span>Size</span><strong>${escapeHTML(app.size || "Unknown")}</strong></div>
+      <div class="meta-item"><span>Developer</span><strong>Premium Store</strong></div>
+    </div>
+
+    <div class="details-body">
+      <h3>About this App</h3>
+      <p>${escapeHTML(app.description)}</p>
+    </div>
+    
+    <div class="download-section">
+      ${buttonsHTML}
+    </div>
+  `;
+}
+
+window.handleDownload = async function(appId, targetUrl) {
+  window.open(targetUrl, '_blank');
+  try { await db.collection("apps").doc(appId).update({ downloads: firebase.firestore.FieldValue.increment(1) }); } catch(e) {}
+};
+
+function escapeHTML(value) { return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
