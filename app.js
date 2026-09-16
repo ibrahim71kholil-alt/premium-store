@@ -1,10 +1,9 @@
 /* ==========================================
-   PREMIUM STORE - USER WEBSITE JS
+   PREMIUM STORE - USER WEBSITE JS (UPDATED)
    ========================================== */
 
-/* ================= FIREBASE CONFIG ================= */
-// আপনার ফায়ারবেস API কনফিগারেশন
 const firebaseConfig = {
+  // আপনার ফায়ারবেস কনফিগারেশন
   apiKey: "AIzaSyDNItGEILCV3ssNYSe2sSqa-4w40GfNsLs",
   authDomain: "premium-store-abb6f.firebaseapp.com",
   projectId: "premium-store-abb6f",
@@ -16,7 +15,6 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-/* ================= ELEMENTS ================= */
 const appsGrid = document.getElementById("appsGrid");
 const searchInput = document.getElementById("searchInput");
 const filterButtons = document.querySelectorAll(".filter-btn");
@@ -24,7 +22,6 @@ const filterButtons = document.querySelectorAll(".filter-btn");
 let allApps = []; 
 let currentCategory = "All";
 
-/* ================= SKELETON LOADER ================= */
 function showSkeletonLoader() {
   appsGrid.innerHTML = "";
   for(let i = 0; i < 6; i++) {
@@ -44,32 +41,23 @@ function showSkeletonLoader() {
   }
 }
 
-/* ================= LOAD APPS ================= */
 async function loadUserApps() {
   showSkeletonLoader();
-
   try {
     const snapshot = await db.collection("apps").orderBy("createdAt", "desc").get();
     allApps = [];
-    
-    snapshot.forEach(doc => {
-      allApps.push({ id: doc.id, ...doc.data() });
-    });
-
+    snapshot.forEach(doc => { allApps.push({ id: doc.id, ...doc.data() }); });
     filterAndRenderApps();
   } catch (error) {
-    console.error("Error:", error);
-    appsGrid.innerHTML = '<div style="text-align:center; width:100%; color:red;">Failed to load apps. (Check Firestore Rules)</div>';
+    appsGrid.innerHTML = '<div style="text-align:center; width:100%; color:red;">Failed to load apps. Check Firestore rules.</div>';
   }
 }
 
-/* ================= FILTER LOGIC ================= */
 if (filterButtons.length > 0) {
   filterButtons.forEach(btn => {
     btn.addEventListener("click", (e) => {
       filterButtons.forEach(b => b.classList.remove("active"));
       e.target.classList.add("active");
-
       currentCategory = e.target.getAttribute("data-category");
       filterAndRenderApps();
     });
@@ -82,23 +70,19 @@ if (searchInput) {
 
 function filterAndRenderApps() {
   const searchTerm = searchInput ? searchInput.value.toLowerCase() : "";
-  
   const filteredApps = allApps.filter(app => {
     const matchSearch = app.name && app.name.toLowerCase().includes(searchTerm);
     const matchCategory = currentCategory === "All" || app.category === currentCategory;
     return matchSearch && matchCategory;
   });
-
   renderUserApps(filteredApps);
 }
 
-/* ================= RENDER APPS ================= */
 function renderUserApps(apps) {
   if (apps.length === 0) {
     appsGrid.innerHTML = '<div style="text-align:center; width:100%; color:#707782;">No apps found.</div>';
     return;
   }
-
   appsGrid.innerHTML = "";
 
   apps.forEach(app => {
@@ -111,6 +95,24 @@ function renderUserApps(apps) {
 
     let sizeText = app.size ? escapeHTML(app.size) : "Unknown Size";
     let downloads = app.downloads ? app.downloads : 0;
+
+    // বাটন তৈরি করার লজিক (টেলিগ্রাম এবং হোয়াটসঅ্যাপ)
+    let buttonsHTML = '<div class="btn-group">';
+    
+    if (app.telegramUrl) {
+      buttonsHTML += `<button class="btn-telegram" onclick="handleDownload('${app.id}', '${escapeHTML(app.telegramUrl)}')">✈️ Telegram</button>`;
+    }
+    
+    if (app.whatsappUrl) {
+      buttonsHTML += `<button class="btn-whatsapp" onclick="handleDownload('${app.id}', '${escapeHTML(app.whatsappUrl)}')">💬 WhatsApp</button>`;
+    }
+    
+    // যদি কোনো অ্যাপে শুধু পুরনো ড্রাইভ লিংক (apkUrl) থাকে
+    if (!app.telegramUrl && !app.whatsappUrl && app.apkUrl) {
+      buttonsHTML += `<button class="download-btn" onclick="handleDownload('${app.id}', '${escapeHTML(app.apkUrl)}')">Download APK</button>`;
+    }
+    
+    buttonsHTML += '</div>';
 
     card.innerHTML = `
       <div class="app-card-header">
@@ -125,31 +127,29 @@ function renderUserApps(apps) {
         <span>📥 ${downloads} Downloads</span>
         <span>${sizeText}</span>
       </div>
-      <button class="download-btn" onclick="handleDownload('${app.id}', '${escapeHTML(app.apkUrl)}')">
-        Download APK
-      </button>
+      ${buttonsHTML}
     `;
 
     appsGrid.appendChild(card);
   });
 }
 
-/* ================= LIVE DOWNLOAD COUNTER ================= */
-window.handleDownload = async function(appId, apkUrl) {
-  window.open(apkUrl, '_blank');
-
+window.handleDownload = async function(appId, targetUrl) {
+  // লিংকে ক্লিক করলে নতুন ট্যাবে ওপেন করবে
+  window.open(targetUrl, '_blank');
+  
+  // ফায়ারবেসে ডাউনলোড কাউন্ট ১ বাড়াবে
   try {
     await db.collection("apps").doc(appId).update({
       downloads: firebase.firestore.FieldValue.increment(1)
     });
-    
     const appIndex = allApps.findIndex(a => a.id === appId);
     if(appIndex !== -1) {
       allApps[appIndex].downloads = (allApps[appIndex].downloads || 0) + 1;
       filterAndRenderApps();
     }
   } catch(error) {
-    console.error("Counter update failed:", error);
+    console.error("Counter update failed", error);
   }
 };
 
