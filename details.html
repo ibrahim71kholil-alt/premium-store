@@ -24,7 +24,68 @@
     .btn-telegram { background: #0088cc; color: #fff; padding: 15px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; text-align: center; }
     .btn-whatsapp { background: #25D366; color: #fff; padding: 15px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; text-align: center; }
     .download-btn { background: #374F4E; color: #fff; padding: 15px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; text-align: center; }
+  /* ==========================================
+   PREMIUM STORE - ANIMATIONS
+   ========================================== */
+
+/* 1. App Card Entry (নিচ থেকে ভেসে ওঠা) */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.app-card {
+  animation: fadeUp 0.6s ease-out forwards;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 2. App Card Hover Effect (কার্ড হালকা ভেসে থাকা) */
+.app-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* 3. Button Animations (বাটনের স্মুথ ইফেক্ট) */
+.btn-telegram, .btn-whatsapp, .download-btn, .back-btn {
+  transition: all 0.3s ease;
+}
+
+.btn-telegram:hover, .btn-whatsapp:hover, .download-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+  filter: brightness(1.1);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Back Button Hover */
+.back-btn:hover {
+  transform: translateX(-5px);
+  background: #e2e8f0;
+}
+
+/* 4. Details Page Container Animation (স্মুথ এন্ট্রি) */
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.95) translateY(15px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.details-container {
+  animation: popIn 0.5s ease-out forwards;
+}
+
+/* 5. Skeleton Loading Animation (চকচকে লোডিং ইফেক্ট) */
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+}
+
   </style>
+  
 </head>
 <body>
   <header class="main-header">
