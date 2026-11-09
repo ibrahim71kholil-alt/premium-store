@@ -3,89 +3,372 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Premium Store - Best Apps</title>
+  <title>Premium Store - Online Shopping</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* ওয়েবসাইটের ওপরের অংশ (Header & Hero) ঠিক করার জন্য স্টাইল */
+    /* মূল বডি ও হেডার স্টাইল */
     body { margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f4f7f6; }
+    
     .top-header {
       background-color: #374F4E;
-      padding: 15px 20px;
+      padding: 14px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       color: white;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
     }
-    .top-header .logo { font-weight: bold; font-size: 18px; display: flex; align-items: center; gap: 8px;}
+
+    /* নতুন শপিং লোগো ডিজাইন */
+    .top-header .logo {
+      font-weight: 800;
+      font-size: 19px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: 0.5px;
+      color: #ffffff;
+      text-decoration: none;
+    }
+    .logo-icon {
+      background: #f59e0b;
+      color: #1a1a1a;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4);
+    }
+    .logo-text span {
+      display: block;
+      font-size: 10px;
+      font-weight: normal;
+      color: #cbd5e1;
+      letter-spacing: 1px;
+    }
+
     .top-header .search-box input {
-      padding: 8px 15px;
-      border-radius: 20px;
+      padding: 9px 16px;
+      border-radius: 25px;
       border: none;
       outline: none;
-      width: 180px;
+      width: 200px;
       font-size: 14px;
+      background: #ffffff;
     }
-    .hero-section {
-      background-color: #374F4E;
+
+    /* মোটা শপিং ব্যানার (Promotional Hero Banner) */
+    .hero-banner-wrapper {
+      background: linear-gradient(135deg, #2b3f3e 0%, #374F4E 60%, #1e2d2c 100%);
       color: white;
-      text-align: center;
-      padding: 40px 20px;
+      padding: 45px 20px;
+      margin-bottom: 25px;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 4px solid #f59e0b;
+    }
+    .hero-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 25px;
+      flex-wrap: wrap;
+    }
+    .hero-content {
+      flex: 1;
+      min-width: 280px;
+    }
+    .promo-badge {
+      display: inline-block;
+      background: #f59e0b;
+      color: #111827;
+      font-weight: bold;
+      font-size: 12px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+    .hero-content h1 {
+      margin: 0 0 12px 0;
+      font-size: 32px;
+      line-height: 1.25;
+    }
+    .hero-content p {
+      margin: 0 0 20px 0;
+      font-size: 15px;
+      color: #d1d5db;
+      line-height: 1.5;
+    }
+    .hero-features {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: #e2e8f0;
       margin-bottom: 20px;
     }
-    .hero-section h1 { margin: 0 0 10px 0; font-size: 26px; }
-    .hero-section p { margin: 0; font-size: 14px; color: #d1d5db; }
+    .hero-features span {
+      background: rgba(255,255,255,0.1);
+      padding: 6px 12px;
+      border-radius: 8px;
+    }
+    .shop-now-btn {
+      background: #f59e0b;
+      color: #111;
+      border: none;
+      padding: 12px 26px;
+      font-size: 15px;
+      font-weight: bold;
+      border-radius: 25px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: 0.2s;
+    }
+    .shop-now-btn:hover { background: #d97706; color: white; }
+
+    /* ব্যানারের ডান পাশের শপিং কার্ড গ্রাফিক্স */
+    .hero-visual {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      padding: 20px 25px;
+      text-align: center;
+      min-width: 220px;
+      backdrop-filter: blur(5px);
+    }
+    .hero-visual .big-icon { font-size: 48px; margin-bottom: 8px; }
+    .hero-visual h3 { margin: 5px 0; font-size: 20px; color: #f59e0b; }
+    .hero-visual p { margin: 0; font-size: 13px; color: #e5e7eb; }
+
+    /* ক্যাটাগরি ফিল্টার ও কন্টেইনার */
     .filters { display: flex; gap: 10px; padding: 0 20px; margin-bottom: 20px; overflow-x: auto; white-space: nowrap; }
-    .filter-btn { padding: 8px 15px; border-radius: 20px; border: 1px solid #ccc; background: white; cursor: pointer; font-size: 14px; color: #333;}
+    .filter-btn { padding: 8px 16px; border-radius: 20px; border: 1px solid #ccc; background: white; cursor: pointer; font-size: 14px; color: #333; font-weight: 500;}
     .filter-btn.active { background: #374F4E; color: white; border-color: #374F4E; }
-    .section-title { padding: 0 20px; margin-bottom: 15px; }
+    .section-title { padding: 0 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
     .section-title h2 { margin: 0; font-size: 20px; color: #1a1a1a; }
     .container { max-width: 1000px; margin: 0 auto; }
-    footer { text-align: center; padding: 20px; color: #707782; font-size: 13px; margin-top: 20px;}
+
+    /* প্রোডাক্ট কার্ডের দাম ও ছবির অ্যাডজাস্টমেন্ট */
+    .product-img-box {
+      width: 100%;
+      height: 180px;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #f9fafb;
+      margin-bottom: 12px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .product-img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .discount-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: #ef4444;
+      color: white;
+      font-size: 11px;
+      font-weight: bold;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .price-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 8px 0;
+    }
+    .current-price { font-size: 18px; font-weight: bold; color: #374F4E; }
+    .old-price { font-size: 13px; color: #9ca3af; text-decoration: line-through; }
+
+    /* অর্ডার পপ-আপ (Checkout Modal) */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+      box-sizing: border-box;
+    }
+    .order-modal {
+      background: white;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 14px;
+      padding: 22px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      position: relative;
+    }
+    .close-modal {
+      position: absolute;
+      top: 12px; right: 15px;
+      font-size: 22px;
+      cursor: pointer;
+      color: #666;
+      border: none;
+      background: none;
+    }
+    .order-modal h3 { margin: 0 0 15px 0; color: #374F4E; font-size: 19px; }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 13px; margin-bottom: 5px; font-weight: bold; color: #333; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    .order-summary {
+      background: #f4f7f6;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 12px 0;
+      font-size: 14px;
+    }
+    .order-summary div { display: flex; justify-content: space-between; margin-bottom: 5px; }
+    .order-summary .total-row { font-weight: bold; font-size: 16px; color: #374F4E; border-top: 1px solid #ccc; padding-top: 6px; }
+
+    footer { text-align: center; padding: 25px 20px; color: #707782; font-size: 13px; margin-top: 30px; border-top: 1px solid #e5e7eb;}
     
-    /* সার্চ বারের জন্য রেস্পন্সিভ ডিজাইন */
     @media (max-width: 600px) {
       .top-header { flex-direction: row; gap: 10px; }
-      .top-header .search-box input { width: 140px; }
+      .top-header .search-box input { width: 135px; }
+      .hero-content h1 { font-size: 24px; }
+      .hero-banner-wrapper { padding: 30px 15px; }
+      .hero-visual { width: 100%; box-sizing: border-box; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Header with Logo and Search -->
+  <!-- Top Header with Shopping Logo & Search -->
   <div class="top-header">
-    <div class="logo">◆ PREMIUM STORE</div>
+    <a href="index.html" class="logo">
+      <div class="logo-icon">
+        <!-- Shopping Bag SVG Icon -->
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <path d="M16 10a4 4 0 0 1-8 0"></path>
+        </svg>
+      </div>
+      <div class="logo-text">
+        PREMIUM STORE
+        <span>ONLINE SHOP</span>
+      </div>
+    </a>
+
     <div class="search-box">
-      <input type="text" id="searchInput" placeholder="Search apps...">
+      <input type="text" id="searchInput" placeholder="Search products...">
     </div>
   </div>
 
-  <!-- Hero Banner -->
-  <div class="hero-section">
-    <h1>Welcome to Premium Store</h1>
-    <p>Download the latest and best premium applications for free.</p>
+  <!-- Thick Shopping Hero Banner -->
+  <div class="hero-banner-wrapper">
+    <div class="hero-container">
+      <div class="hero-content">
+        <span class="promo-badge">🔥 Special Mega Sale</span>
+        <h1>প্রিমিয়াম কোয়ালিটির প্রোডাক্ট কিনুন সেরা দামে!</h1>
+        <p>সারাদেশে দ্রুত হোম ডেলিভারি। প্রোডাক্ট হাতে পেয়ে দেখে মূল্য পরিশোধ করার সুবিধা।</p>
+        <div class="hero-features">
+          <span>🚚 Cash On Delivery</span>
+          <span>⚡ Fast Shipping</span>
+          <span>✅ 100% Authentic</span>
+        </div>
+        <a href="#productsSection" class="shop-now-btn">🛒 এখনই শপিং করুন</a>
+      </div>
+
+      <div class="hero-visual">
+        <div class="big-icon">🛍️</div>
+        <h3>Up to 40% OFF</h3>
+        <p>আজকের স্পেশাল অফার মিস করবেন না!</p>
+      </div>
+    </div>
   </div>
 
-  <main class="container">
+  <!-- Main Products Section -->
+  <main class="container" id="productsSection">
     <div class="section-title">
-      <h2>Explore Apps</h2>
+      <h2>🔥 All Products</h2>
     </div>
     
-    <!-- Filter Buttons -->
+    <!-- Product Category Filter Buttons -->
     <div class="filters">
-      <button class="filter-btn active" data-category="All">All</button>
-      <button class="filter-btn" data-category="AI">AI</button>
-      <button class="filter-btn" data-category="Tools">Tools</button>
-      <button class="filter-btn" data-category="Entertainment">Entertainment</button>
-      <button class="filter-btn" data-category="Social">Social</button>
-      <button class="filter-btn" data-category="Security">Security</button>
-      <button class="filter-btn" data-category="Other">Other</button>
+      <button class="filter-btn active" data-category="All">All Products</button>
+      <button class="filter-btn" data-category="Watches">⌚ Watches</button>
+      <button class="filter-btn" data-category="Gadgets">🎧 Gadgets</button>
+      <button class="filter-btn" data-category="Fashion">👕 Fashion</button>
+      <button class="filter-btn" data-category="Electronics">💡 Electronics</button>
+      <button class="filter-btn" data-category="Other">📦 Others</button>
     </div>
 
-    <!-- App Cards Container -->
+    <!-- Product Cards Container (Using same class so style.css works) -->
     <div id="appsGrid" class="apps-grid">
-      <!-- Apps will be loaded here from Firebase -->
+      <!-- Products will load here from Firebase -->
     </div>
   </main>
+
+  <!-- Instant Checkout Modal -->
+  <div id="orderModal" class="modal-overlay">
+    <div class="order-modal">
+      <button class="close-modal" onclick="closeOrderModal()">&times;</button>
+      <h3>🛒 অর্ডার কনফার্ম করুন</h3>
+      <form id="checkoutForm">
+        <input type="hidden" id="orderProductId">
+        <input type="hidden" id="orderProductName">
+        <input type="hidden" id="orderProductPrice">
+
+        <div class="form-group">
+          <label>আপনার নাম *</label>
+          <input type="text" id="custName" required placeholder="সম্পূর্ণ নাম লিখুন">
+        </div>
+        <div class="form-group">
+          <label>মোবাইল নাম্বার *</label>
+          <input type="tel" id="custPhone" required placeholder="01XXXXXXXXX">
+        </div>
+        <div class="form-group">
+          <label>ডেলিভারি এরিয়া *</label>
+          <select id="deliveryArea" onchange="updateOrderTotal()">
+            <option value="70">ঢাকার ভেতরে (৭০ টাকা)</option>
+            <option value="130">ঢাকার বাইরে (১৩০ টাকা)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>সম্পূর্ণ ঠিকানা (জেলা, থানা ও এলাকা) *</label>
+          <textarea id="custAddress" rows="2" required placeholder="আপনার বাসা/এলাকার ঠিকানা লিখুন"></textarea>
+        </div>
+
+        <div class="order-summary">
+          <div><span>প্রোডাক্ট:</span> <span id="summaryName">-</span></div>
+          <div><span>মূল্য:</span> <span>৳ <span id="summaryPrice">0</span></span></div>
+          <div><span>ডেলিভারি চার্জ:</span> <span>৳ <span id="summaryDelivery">70</span></span></div>
+          <div class="total-row"><span>সর্বমোট বিল:</span> <span>৳ <span id="summaryTotal">0</span></span></div>
+        </div>
+
+        <button type="submit" class="download-btn" id="submitOrderBtn" style="width:100%;">
+          ✅ Confirm Order (Cash on Delivery)
+        </button>
+      </form>
+    </div>
+  </div>
 
   <footer>
     <p>&copy; 2026 Premium Store. All rights reserved.</p>
@@ -95,10 +378,7 @@
   <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
   
-  <!-- App Functionality -->
-  <script src="app.js"></script>
-
-  <!-- Adsterra Income Code -->
-  <script src="https://pl31374249.profitableratecpmnetwork.com/1d/30/8d/1d308d008f39b503bd14acce9df36328.js"></script>
+  <!-- Main Store Script (নোট: আপনার ফাইলটির নাম app.js হলে নিচে app.js রাখবেন, আর script.js হলে script.js করে দেবেন) -->
+  <script src="script.js"></script>
 </body>
 </html>
